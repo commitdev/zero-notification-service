@@ -28,18 +28,18 @@ func main() {
 	// Heartbeat for liveness check
 	go heartbeat()
 
-	EmailApiService := service.NewEmailApiService()
+	config := config.GetConfig()
+
+	EmailApiService := service.NewEmailApiService(config)
 	EmailApiController := server.NewEmailApiController(EmailApiService)
 
-	HealthApiService := service.NewHealthApiService()
+	HealthApiService := service.NewHealthApiService(config)
 	HealthApiController := server.NewHealthApiController(HealthApiService)
 
-	NotificationApiService := service.NewNotificationApiService()
+	NotificationApiService := service.NewNotificationApiService(config)
 	NotificationApiController := server.NewNotificationApiController(NotificationApiService)
 
 	router := server.NewRouter(EmailApiController, HealthApiController, NotificationApiController)
-
-	config := config.GetConfig()
 
 	serverAddress := fmt.Sprintf("0.0.0.0:%d", config.Port)
 	server := &http.Server{Addr: serverAddress, Handler: router}

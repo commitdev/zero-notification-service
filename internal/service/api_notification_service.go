@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/commitdev/zero-notification-service/internal/config"
 	"github.com/commitdev/zero-notification-service/internal/server"
 )
 
@@ -12,11 +13,12 @@ import (
 // This service should implement the business logic for every endpoint for the NotificationApi API.
 // Include any external packages or services that will be required by this service.
 type NotificationApiService struct {
+	config *config.Config
 }
 
 // NewNotificationApiService creates a default api service
-func NewNotificationApiService() server.NotificationApiServicer {
-	return &NotificationApiService{}
+func NewNotificationApiService(c *config.Config) server.NotificationApiServicer {
+	return &NotificationApiService{c}
 }
 
 // NotificationSubscribe - Subscribe to notifications
