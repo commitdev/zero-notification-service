@@ -1,0 +1,211 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Zero Notification Service
+servers:
+  - url: http://zero.commit.dev/v1
+
+paths:
+  /status/ready:
+    get:
+      summary: Readiness check - the service is ready to handle work
+      operationId: readyCheck
+      tags:
+        - health
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /email/send:
+    post:
+      summary: Send an email
+      operationId: sendEmail
+      tags:
+        - email
+      requestBody:
+        description: Parameters of the message to send
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailMessage'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+  /notification/send:
+    post:
+      summary: Send a notification
+      operationId: sendNotification
+      tags:
+        - notification
+      requestBody:
+        description: Parameters of the message to send
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationMessage'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /notification/subscribe:
+    post:
+      summary: Subscribe to notifications
+      operationId: notificationSubscribe
+      tags:
+        - notification
+      requestBody:
+        description: Parameters of the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /notification/unsubscribe:
+    post:
+      summary: Unsubscribe to notifications
+      operationId: notificationUnsubscribe
+      tags:
+        - notification
+      requestBody:
+        description: Parameters of the unsubscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Recipient:
+      type: object
+      required:
+        - name
+        - address
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+    Sender:
+      type: object
+      required:
+        - name
+        - address
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+    EmailMessage:
+      type: object
+      required:
+      - to
+      - from
+      - subject
+      properties:
+        to:
+          $ref: '#/components/schemas/Recipient'
+        from:
+          $ref: '#/components/schemas/Sender'
+        subject:
+          type: string
+        body:
+          type: string
+        richBody:
+          type: string
+        templateId:
+          type: string
+    NotificationMessage:
+      type: object
+      required:
+      - to
+      - subject
+      properties:
+        to:
+          $ref: '#/components/schemas/Recipient'
+        subject:
+          type: string
+        body:
+          type: string
+        templateId:
+          type: string
+    SubscribeRequest:
+      type: object
+      properties:
+        topicId:
+          type: string
+      required:
+        - topicId
+    UnsubscribeRequest:
+      type: object
+      properties:
+        topicId:
+          type: string
+      required:
+        - topicId
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
