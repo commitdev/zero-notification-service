@@ -15,10 +15,10 @@ type HealthApiService struct {
 
 // NewHealthApiService creates a default api service
 func NewHealthApiService() server.HealthApiServicer {
-	return &server.HealthApiService{}
+	return &HealthApiService{}
 }
 
 // ReadyCheck - Readiness check - the service is ready to handle work
 func (s *HealthApiService) ReadyCheck(ctx context.Context) (server.ImplResponse, error) {
-	return server.Response(http.StatusOK, ""), nil
+	return server.Response(http.StatusOK, "OK"), nil
 }

@@ -10,15 +10,23 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
+	"github.com/commitdev/zero-notification-service/internal/config"
 	"github.com/commitdev/zero-notification-service/internal/server"
 	"github.com/commitdev/zero-notification-service/internal/service"
 )
 
 func main() {
-	log.Printf("Server started")
+	// Heartbeat for liveness check
+	go heartbeat()
 
 	EmailApiService := service.NewEmailApiService()
 	EmailApiController := server.NewEmailApiController(EmailApiService)
@@ -31,5 +39,47 @@ func main() {
 
 	router := server.NewRouter(EmailApiController, HealthApiController, NotificationApiController)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	config := config.GetConfig()
+
+	serverAddress := fmt.Sprintf("0.0.0.0:%d", config.Port)
+	server := &http.Server{Addr: serverAddress, Handler: router}
+
+	// Watch for signals to handle graceful shutdown
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+
+	// Run the server in a goroutine
+	go func() {
+		log.Printf("Serving at http://%s/", serverAddress)
+		err := server.ListenAndServe()
+		if err != http.ErrServerClosed {
+			log.Fatalf("Fatal error while serving HTTP: %v\n", err)
+			close(stop)
+		}
+	}()
+
+	// Block while reading from the channel until we receive a signal
+	sig := <-stop
+	log.Printf("Received signal %s, starting graceful shutdown", sig)
+
+	// Give connections some time to drain
+	ctx, cancel := context.WithTimeout(context.Background(), config.GracefulShutdownTimeout*time.Second)
+	defer cancel()
+	err := server.Shutdown(ctx)
+	if err != nil {
+		log.Fatalf("Error during shutdown, client requests have been terminated: %v\n", err)
+	} else {
+		log.Println("Graceful shutdown complete")
+	}
+}
+
+func heartbeat() {
+	for range time.Tick(4 * time.Second) {
+		fh, err := os.Create("/tmp/service-alive")
+		if err != nil {
+			log.Println("Unable to write file for liveness check!")
+		} else {
+			fh.Close()
+		}
+	}
 }
