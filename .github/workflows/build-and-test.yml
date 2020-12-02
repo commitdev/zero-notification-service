@@ -28,6 +28,8 @@ jobs:
     - name: Generate code
       run: |
         docker run --rm -v ${GITHUB_WORKSPACE}:/local openapitools/openapi-generator-cli generate -i /local/api/notification-service.yaml -g go-server -o /local/ -p sourceFolder=internal/server -p packageName=server --git-user-id=commitdev --git-repo-id=zero-notification-service
+        go get golang.org/x/tools/cmd/goimports
+        goimports -w ${GITHUB_WORKSPACE}/internal/server/
 
     - name: Run go vet
       id: go_vet
