@@ -30,6 +30,8 @@ jobs:
       uses: github/super-linter@v3
       env:
         VALIDATE_ALL_CODEBASE: false
+        DEFAULT_BRANCH: main
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Run go vet
       id: go_vet
