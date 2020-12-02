@@ -1,0 +1,53 @@
+name: 'Build and test code'
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.14
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.14
+
+    - uses: actions/checkout@v2
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Run go fmt
+      id: go_fmt
+      run: |
+        BAD_FILES=$(gofmt -l ${GITHUB_WORKSPACE})
+        [[ "${BAD_FILES}" == "" ]] && echo "Formatting errors detected: ${BAD_FILES}" && exit 1
+
+    # Try the github super linter
+    - name: Lint Code Base
+      uses: github/super-linter@v3
+      env:
+        VALIDATE_ALL_CODEBASE: false
+
+    - name: Run go vet
+      id: go_vet
+      run: |
+        go vet ${GITHUB_WORKSPACE}/...
+
+    - name: Build project
+      id: build
+      run: |
+        make build
+
+    - name: Run tests
+      id: test
+      run: |
+        make test
