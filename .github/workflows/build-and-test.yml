@@ -25,12 +25,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
-    - name: Run go fmt
-      id: go_fmt
-      run: |
-        BAD_FILES=$(gofmt -l ${GITHUB_WORKSPACE})
-        [[ "${BAD_FILES}" == "" ]] && echo "Formatting errors detected: ${BAD_FILES}" && exit 1
-
     # Try the github super linter
     - name: Lint Code Base
       uses: github/super-linter@v3
@@ -41,6 +35,12 @@ jobs:
       id: go_vet
       run: |
         go vet ${GITHUB_WORKSPACE}/...
+
+    - name: Run go fmt
+      id: go_fmt
+      run: |
+        BAD_FILES=$(gofmt -l ${GITHUB_WORKSPACE})
+        [[ "${BAD_FILES}" == "" ]] || (echo "Formatting errors detected: ${BAD_FILES}" && exit 1)
 
     - name: Build project
       id: build
