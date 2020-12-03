@@ -24,7 +24,14 @@ import (
 	"github.com/commitdev/zero-notification-service/internal/service"
 )
 
+var (
+	appVersion = "SNAPSHOT"
+	appBuild   = "SNAPSHOT"
+)
+
 func main() {
+	fmt.Printf("zero-notification-service version: %v, build: %v \n", appVersion, appBuild)
+
 	// Heartbeat for liveness check
 	go heartbeat()
 

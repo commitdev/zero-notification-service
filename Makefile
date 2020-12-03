@@ -1,5 +1,10 @@
+VERSION ?= SNAPSHOT
+BUILD ?=$(shell git rev-parse --short HEAD)
+PKG ?=github.com/commitdev/zero-notification-service
+BUILD_ARGS=-installsuffix cgo -v -trimpath -ldflags=all="-X main.appVersion=${VERSION} -X main.appBuild=${BUILD}"
+
 build:
-	go build -a -installsuffix cgo -o zero-notification-service ./cmd/server/
+	go build ${BUILD_ARGS} -o zero-notification-service ./cmd/server/
 
 run:
 	go run cmd/server/main.go
@@ -14,3 +19,6 @@ docker:
 
 docker-run:
 	docker run --rm -it zero-notification-service
+
+test:
+	go test ./...
