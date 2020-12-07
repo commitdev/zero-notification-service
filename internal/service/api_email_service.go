@@ -38,7 +38,7 @@ func (s *EmailApiService) SendEmail(ctx context.Context, sendMailRequest server.
 		return server.Response(http.StatusInternalServerError, nil), fmt.Errorf("Unable to send email: %v from mail provider: %v", response.StatusCode, response.Body)
 	}
 
-	return server.Response(http.StatusOK, server.SendMailResponse{response.Headers["X-Message-Id"][0]}), nil
+	return server.Response(http.StatusOK, server.SendMailResponse{TrackingId: response.Headers["X-Message-Id"][0]}), nil
 }
 
 // SendBulk - Send a batch of emails to many users with the same content. Note that it is possible for only a subset of these to fail.
@@ -56,17 +56,17 @@ func (s *EmailApiService) SendBulk(ctx context.Context, sendBulkMailRequest serv
 	for r := range responseChannel {
 		if r.Error != nil {
 			fmt.Printf("Error sending bulk mail: %v", r.Error)
-			failed = append(failed, server.SendBulkMailResponseFailed{r.EmailAddress, fmt.Sprintf("Unable to send email: %v\n", r.Error)})
+			failed = append(failed, server.SendBulkMailResponseFailed{EmailAddress: r.EmailAddress, Error: fmt.Sprintf("Unable to send email: %v\n", r.Error)})
 		} else if !(r.Response.StatusCode >= 200 && r.Response.StatusCode <= 299) {
 			fmt.Printf("Failure from Sendgrid when sending bulk mail: %v", r.Response)
-			failed = append(failed, server.SendBulkMailResponseFailed{r.EmailAddress, fmt.Sprintf("Unable to send email: %v from mail provider: %v\n", r.Response.StatusCode, r.Response.Body)})
+			failed = append(failed, server.SendBulkMailResponseFailed{EmailAddress: r.EmailAddress, Error: fmt.Sprintf("Unable to send email: %v from mail provider: %v\n", r.Response.StatusCode, r.Response.Body)})
 		} else {
-			successful = append(successful, server.SendBulkMailResponseSuccessful{r.EmailAddress, r.Response.Headers["X-Message-Id"][0]})
+			successful = append(successful, server.SendBulkMailResponseSuccessful{EmailAddress: r.EmailAddress, TrackingId: r.Response.Headers["X-Message-Id"][0]})
 		}
 	}
 	responseCode := http.StatusOK
 	if len(successful) == 0 {
 		responseCode = http.StatusInternalServerError
 	}
-	return server.Response(responseCode, server.SendBulkMailResponse{successful, failed}), nil
+	return server.Response(responseCode, server.SendBulkMailResponse{Successful: successful, Failed: failed}), nil
 }

@@ -30,9 +30,12 @@ func TestSendBulkMail(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	sendCount := rand.Intn(5) + 2
 	for i := 0; i < sendCount; i++ {
-		toList = append(toList, server.Recipient{fmt.Sprintf("Test Recipient %d", i), fmt.Sprintf("address%d@domain.com", i)})
+		toList = append(toList, server.Recipient{
+			Name:    fmt.Sprintf("Test Recipient %d", i),
+			Address: fmt.Sprintf("address%d@domain.com", i),
+		})
 	}
-	from := server.Sender{"Test User", "address@domain.com"}
+	from := server.Sender{Name: "Test User", Address: "address@domain.com"}
 	message := server.MailMessage{Subject: "Subject", Body: "Body"}
 	client := FakeClient{}
 
