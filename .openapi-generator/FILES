@@ -9,10 +9,15 @@ internal/server/api_notification_service.go
 internal/server/helpers.go
 internal/server/impl.go
 internal/server/logger.go
-internal/server/model_email_message.go
 internal/server/model_error.go
+internal/server/model_mail_message.go
 internal/server/model_notification_message.go
 internal/server/model_recipient.go
+internal/server/model_send_bulk_mail_request.go
+internal/server/model_send_bulk_mail_response.go
+internal/server/model_send_bulk_mail_response_failed.go
+internal/server/model_send_bulk_mail_response_successful.go
+internal/server/model_send_mail_request.go
 internal/server/model_send_mail_response.go
 internal/server/model_send_notification_response.go
 internal/server/model_sender.go
