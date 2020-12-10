@@ -12,7 +12,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,8 +19,10 @@ import (
 	"time"
 
 	"github.com/commitdev/zero-notification-service/internal/config"
+	"github.com/commitdev/zero-notification-service/internal/log"
 	"github.com/commitdev/zero-notification-service/internal/server"
 	"github.com/commitdev/zero-notification-service/internal/service"
+	"go.uber.org/zap"
 )
 
 var (
@@ -30,12 +31,15 @@ var (
 )
 
 func main() {
-	fmt.Printf("zero-notification-service version: %v, build: %v \n", appVersion, appBuild)
+	config := config.GetConfig()
+
+	log.Init(config)
+	defer zap.S().Sync() // Flush logs when the process ends
+
+	zap.S().Infow("zero-notification-service", "version", appVersion, "build", appBuild)
 
 	// Heartbeat for liveness check
 	go heartbeat()
-
-	config := config.GetConfig()
 
 	EmailApiService := service.NewEmailApiService(config)
 	EmailApiController := server.NewEmailApiController(EmailApiService)
@@ -57,26 +61,26 @@ func main() {
 
 	// Run the server in a goroutine
 	go func() {
-		log.Printf("Serving at http://%s/", serverAddress)
+		zap.S().Infof("Serving at http://%s/", serverAddress)
 		err := server.ListenAndServe()
 		if err != http.ErrServerClosed {
-			log.Fatalf("Fatal error while serving HTTP: %v\n", err)
+			zap.S().Fatalf("Fatal error while serving HTTP: %v\n", err)
 			close(stop)
 		}
 	}()
 
 	// Block while reading from the channel until we receive a signal
 	sig := <-stop
-	log.Printf("Received signal %s, starting graceful shutdown", sig)
+	zap.S().Infof("Received signal %s, starting graceful shutdown", sig)
 
 	// Give connections some time to drain
 	ctx, cancel := context.WithTimeout(context.Background(), config.GracefulShutdownTimeout*time.Second)
 	defer cancel()
 	err := server.Shutdown(ctx)
 	if err != nil {
-		log.Fatalf("Error during shutdown, client requests have been terminated: %v\n", err)
+		zap.S().Fatalf("Error during shutdown, client requests have been terminated: %v\n", err)
 	} else {
-		log.Println("Graceful shutdown complete")
+		zap.S().Infof("Graceful shutdown complete")
 	}
 }
 
@@ -84,7 +88,7 @@ func heartbeat() {
 	for range time.Tick(4 * time.Second) {
 		fh, err := os.Create("/tmp/service-alive")
 		if err != nil {
-			log.Println("Unable to write file for liveness check!")
+			zap.S().Warnf("Unable to write file for liveness check!")
 		} else {
 			fh.Close()
 		}

@@ -8,7 +8,6 @@ internal/server/api_notification.go
 internal/server/api_notification_service.go
 internal/server/helpers.go
 internal/server/impl.go
-internal/server/logger.go
 internal/server/model_error.go
 internal/server/model_mail_message.go
 internal/server/model_notification_message.go

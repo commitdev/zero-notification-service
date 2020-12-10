@@ -1,5 +1,5 @@
-internal/server
-api/openapi.yaml
-.history/
 zero-notification-service
-
+.history/
+api/openapi.yaml
+internal/server/*
+!internal/server/logger.go

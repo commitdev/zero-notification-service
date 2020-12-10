@@ -32,7 +32,7 @@ func SendBulkMail(toList []server.Recipient, from server.Sender, message server.
 			wg.Done()
 		}(to)
 	}
-	// Wait on the all responses to close the channel to signal that the operation is complete
+	// Wait on all the responses to close the channel to signal that the operation is complete
 	go func() {
 		wg.Wait()
 		close(responseChannel)

@@ -11,6 +11,7 @@ type Config struct {
 	Port                    int
 	SendgridAPIKey          string
 	GracefulShutdownTimeout time.Duration
+	StructuredLogging       bool
 }
 
 var config *Config
@@ -20,6 +21,7 @@ const (
 	Port
 	SendgridAPIKey
 	GracefulShutdownTimeout
+	StructuredLogging
 )
 
 // GetConfig returns a pointer to the singleton Config object
@@ -40,10 +42,14 @@ func loadConfig() *Config {
 	viper.SetDefault(GracefulShutdownTimeout, "10")
 	viper.BindEnv(GracefulShutdownTimeout, "GRACEFUL_SHUTDOWN_TIMEOUT_SECONDS")
 
+	viper.SetDefault(StructuredLogging, "false")
+	viper.BindEnv(StructuredLogging, "STRUCTURED_LOGGING")
+
 	config := Config{
 		Port:                    viper.GetInt(Port),
 		SendgridAPIKey:          viper.GetString(SendgridAPIKey),
 		GracefulShutdownTimeout: viper.GetDuration(GracefulShutdownTimeout),
+		StructuredLogging:       viper.GetBool(StructuredLogging),
 	}
 
 	return &config
