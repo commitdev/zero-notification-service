@@ -16,7 +16,7 @@ type Config struct {
 var config *Config
 
 const (
-	_ = string(iota) // We don't care about the values of these constants
+	_ = string(rune(iota)) // We don't care about the values of these constants
 	Port
 	SendgridAPIKey
 	GracefulShutdownTimeout

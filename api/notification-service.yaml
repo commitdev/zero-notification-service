@@ -32,7 +32,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EmailMessage'
+              $ref: '#/components/schemas/SendMailRequest'
       responses:
         200:
           description: OK
@@ -40,6 +40,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SendMailResponse'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /email/sendBulk:
+    post:
+      summary: Send a batch of emails to many users with the same content. Note that it is possible for only a subset of these to fail.
+      operationId: sendBulk
+      tags:
+        - email
+      requestBody:
+        description: Parameters of the messages to send
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendBulkMailRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendBulkMailResponse'
         default:
           description: unexpected error
           content:
@@ -131,6 +158,7 @@ paths:
 
 components:
   schemas:
+
     Recipient:
       type: object
       required:
@@ -141,6 +169,7 @@ components:
           type: string
         address:
           type: string
+
     Sender:
       type: object
       required:
@@ -151,25 +180,54 @@ components:
           type: string
         address:
           type: string
-    EmailMessage:
+
+    SendMailRequest:
       type: object
       required:
       - to
       - from
-      - subject
       properties:
         to:
           $ref: '#/components/schemas/Recipient'
         from:
           $ref: '#/components/schemas/Sender'
+        message:
+          $ref: '#/components/schemas/MailMessage'
+
+    SendBulkMailRequest:
+      type: object
+      required:
+      - toAddresses
+      - from
+      properties:
+        toAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+        from:
+          $ref: '#/components/schemas/Sender'
+        message:
+          $ref: '#/components/schemas/MailMessage'
+
+    MailMessage:
+      type: object
+      properties:
         subject:
           type: string
         body:
           type: string
+          description: A version of the body containing only text content
         richBody:
           type: string
+          description: A version of the body containing rich content for clients which support it
         templateId:
           type: string
+          description: A template to use instead of specifying the subject and body
+        ScheduleSendAtTimestamp:
+          type: integer
+          description: Schedule these mesages to go out at the time specified by this UNIX timestamp
+          format: int64
+
     NotificationMessage:
       type: object
       required:
@@ -184,6 +242,7 @@ components:
           type: string
         templateId:
           type: string
+
     SubscribeRequest:
       type: object
       properties:
@@ -191,6 +250,7 @@ components:
           type: string
       required:
         - topicId
+
     UnsubscribeRequest:
       type: object
       properties:
@@ -198,20 +258,46 @@ components:
           type: string
       required:
         - topicId
+
     SendMailResponse:
       type: object
       properties:
         trackingId:
           type: string
-      required:
-        - topicId
+
+    SendBulkMailResponse:
+      type: object
+      description: Contains the results of a bulk send operation where some messages may have failed and some may have succeeded
+      properties:
+        successful:
+          type: array
+          items:
+            type: object
+            properties:
+              emailAddress:
+                type: string
+              trackingId:
+                type: string
+        failed:
+          type: array
+          items:
+            type: object
+            properties:
+              emailAddress:
+                type: string
+                description: The address that was being sent to when this failure occurred
+              error:
+                type: string
+              ProviderMessage:
+                type: string
+                description: Error or response message returned by the mail provider
+
     SendNotificationResponse:
       type: object
       properties:
         trackingId:
           type: string
-      required:
-        - topicId
+
     Error:
       type: object
       required:
