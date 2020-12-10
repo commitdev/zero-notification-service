@@ -3,7 +3,8 @@ before:
   hooks:
     - go mod download
 builds:
-- env:
+- main: ./cmd/server/main.go
+  env:
   - CGO_ENABLED=0
   ldflags:
     - -X github.com/commitdev/zero-notification-service/cmd.appVersion={{.Version}} -X github.com/commitdev/zero-notification-service/cmd.appBuild={{.ShortCommit}}
