@@ -1,0 +1,27 @@
+name: 'Build and publish clients'
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Generate client
+      run: |
+        docker run --rm -v ${GITHUB_WORKSPACE}:/local openapitools/openapi-generator-cli generate -i /local/api/notification-service.yaml -g javascript -o /local/client -p projectName="@commitdev/zero-notification-service" -p projectDescription="Generated client for zero-notification-service" -p projectVersion="${{ github.event.release.tag_name }}" -p moduleName="NotificationService"
+        sudo chmod -R a+rw ${GITHUB_WORKSPACE}
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+        registry-url: 'https://registry.npmjs.org'
+    - run: cd client; npm install
+    - run: cd client; npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
