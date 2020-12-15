@@ -14,7 +14,7 @@ jobs:
 
     - name: Generate client
       run: |
-        docker run --rm -v ${GITHUB_WORKSPACE}:/local openapitools/openapi-generator-cli generate -i /local/api/notification-service.yaml -g javascript -o /local/client -p projectName="@commitdev/zero-notification-service" -p projectDescription="Generated client for zero-notification-service" -p projectVersion="${{ github.event.release.tag_name }}" -p moduleName="NotificationService"
+        docker run --rm -v ${GITHUB_WORKSPACE}:/local openapitools/openapi-generator-cli generate -i /local/api/notification-service.yaml -g javascript -o /local/client -p projectName="@commitdev/zero-notification-service-client" -p projectDescription="Generated client for zero-notification-service" -p projectVersion="${{ github.event.release.tag_name }}" -p moduleName="NotificationService"
         sudo chmod -R a+rw ${GITHUB_WORKSPACE}
 
     - uses: actions/setup-node@v1
