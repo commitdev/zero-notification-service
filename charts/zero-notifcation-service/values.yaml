@@ -73,3 +73,11 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+
+# Application Config
+
+application:
+  sendgridApiKey:
+  gracefulShutdownTimeout: 10
+  structuredLogging: true
