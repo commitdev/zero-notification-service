@@ -26,7 +26,7 @@ ENV CGO_ENABLED=0
 RUN make build
 
 
-FROM scratch AS runtime
+FROM alpine:3.13 AS runtime
 COPY --from=build /go/src/zero-notification-service ./
 EXPOSE 80/tcp
 ENTRYPOINT ["./zero-notification-service"]

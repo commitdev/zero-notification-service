@@ -64,7 +64,7 @@ func main() {
 		zap.S().Infof("Serving at http://%s/", serverAddress)
 		err := server.ListenAndServe()
 		if err != http.ErrServerClosed {
-			zap.S().Fatalf("Fatal error while serving HTTP: %v\n", err)
+			zap.S().Fatalf("Fatal error while serving HTTP: %v", err)
 			close(stop)
 		}
 	}()
@@ -78,7 +78,7 @@ func main() {
 	defer cancel()
 	err := server.Shutdown(ctx)
 	if err != nil {
-		zap.S().Fatalf("Error during shutdown, client requests have been terminated: %v\n", err)
+		zap.S().Fatalf("Error during shutdown, client requests have been terminated: %v", err)
 	} else {
 		zap.S().Infof("Graceful shutdown complete")
 	}
@@ -88,7 +88,7 @@ func heartbeat() {
 	for range time.Tick(4 * time.Second) {
 		fh, err := os.Create("/tmp/service-alive")
 		if err != nil {
-			zap.S().Warnf("Unable to write file for liveness check!")
+			zap.S().Errorf("Unable to write file for liveness check: $v", err)
 		} else {
 			fh.Close()
 		}

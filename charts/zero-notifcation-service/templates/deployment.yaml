@@ -46,7 +46,7 @@ spec:
             periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /status/ready
+              path: /v1/status/ready
               port: http
             initialDelaySeconds: 5
             periodSeconds: 10
