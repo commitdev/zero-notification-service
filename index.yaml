@@ -3,6 +3,16 @@ entries:
   zero-notification-service:
   - apiVersion: v2
     appVersion: 0.0.3
+    created: "2021-01-28T19:48:07.108715341Z"
+    description: Zero Notification Service
+    digest: 2018a9265c0ebd2ee9dd8e000320161bc1ca32da8b522b80ac3f726e7c1cb408
+    name: zero-notification-service
+    type: application
+    urls:
+    - https://github.com/commitdev/zero-notification-service/releases/download/zero-notification-service-0.0.2/zero-notification-service-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
+    appVersion: 0.0.3
     created: "2021-01-28T01:47:18.131116471Z"
     description: Zero Notification Service
     digest: 091c458de2c61a5b4ab9df0155438f7ec281915134428890f4a416840fca57fc
