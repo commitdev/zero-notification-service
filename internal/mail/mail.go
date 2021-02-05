@@ -20,13 +20,13 @@ type Client interface {
 
 // SendBulkMail sends a batch of email messages to all the specified recipients
 // All the calls to send mail happen in parallel, with their responses returned on the provided channel
-func SendBulkMail(toList []server.Recipient, from server.Sender, message server.MailMessage, client Client, responseChannel chan BulkSendAttempt) {
+func SendBulkMail(toList []server.EmailRecipient, from server.EmailSender, message server.MailMessage, client Client, responseChannel chan BulkSendAttempt) {
 	wg := sync.WaitGroup{}
 	wg.Add(len(toList))
 
 	// Create goroutines for each send
 	for _, to := range toList {
-		go func(to server.Recipient) {
+		go func(to server.EmailRecipient) {
 			response, err := SendIndividualMail(to, from, message, client)
 			responseChannel <- BulkSendAttempt{to.Address, response, err}
 			wg.Done()
@@ -40,7 +40,7 @@ func SendBulkMail(toList []server.Recipient, from server.Sender, message server.
 }
 
 // SendIndividualMail sends an email message
-func SendIndividualMail(to server.Recipient, from server.Sender, message server.MailMessage, client Client) (*rest.Response, error) {
+func SendIndividualMail(to server.EmailRecipient, from server.EmailSender, message server.MailMessage, client Client) (*rest.Response, error) {
 	sendFrom := sendgridMail.NewEmail(from.Name, from.Address)
 	sendTo := sendgridMail.NewEmail(to.Name, to.Address)
 	sendMessage := sendgridMail.NewSingleEmail(sendFrom, message.Subject, sendTo, message.Body, message.RichBody)
