@@ -79,5 +79,6 @@ affinity: {}
 
 application:
   sendgridApiKey:
+  slackApiKey:
   gracefulShutdownTimeout: 10
   structuredLogging: true
