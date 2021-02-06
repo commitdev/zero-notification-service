@@ -25,17 +25,17 @@ func (cl *FakeClient) Send(email *sendgridMail.SGMailV3) (*rest.Response, error)
 }
 
 func TestSendBulkMail(t *testing.T) {
-	var toList []server.Recipient
+	var toList []server.EmailRecipient
 	// Create a random number of mails
 	rand.Seed(time.Now().UnixNano())
 	sendCount := rand.Intn(5) + 2
 	for i := 0; i < sendCount; i++ {
-		toList = append(toList, server.Recipient{
+		toList = append(toList, server.EmailRecipient{
 			Name:    fmt.Sprintf("Test Recipient %d", i),
 			Address: fmt.Sprintf("address%d@domain.com", i),
 		})
 	}
-	from := server.Sender{Name: "Test User", Address: "address@domain.com"}
+	from := server.EmailSender{Name: "Test User", Address: "address@domain.com"}
 	message := server.MailMessage{Subject: "Subject", Body: "Body"}
 	client := FakeClient{}
 

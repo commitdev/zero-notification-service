@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/commitdev/zero-notification-service/internal/config"
+	"github.com/commitdev/zero-notification-service/internal/notification/slack"
 	"github.com/commitdev/zero-notification-service/internal/server"
+	slack_lib "github.com/slack-go/slack"
 )
 
 // NotificationApiService is a service that implents the logic for the NotificationApiServicer
@@ -21,44 +23,14 @@ func NewNotificationApiService(c *config.Config) server.NotificationApiServicer 
 	return &NotificationApiService{c}
 }
 
-// NotificationSubscribe - Subscribe to notifications
-func (s *NotificationApiService) NotificationSubscribe(ctx context.Context, subscribeRequest server.SubscribeRequest) (server.ImplResponse, error) {
-	// TODO - update NotificationSubscribe with the required logic for this service method.
-	// Add api_notification_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+// SendSlackNotification - Send a Slack message
+func (s *NotificationApiService) SendSlackNotification(ctx context.Context, sendSlackMessageRequest server.SendSlackMessageRequest) (server.ImplResponse, error) {
+	client := slack_lib.New(s.config.SlackAPIKey)
+	timestamp, err := slack.SendMessage(sendSlackMessageRequest.To, sendSlackMessageRequest.Message, sendSlackMessageRequest.ReplyToTimestamp, client)
+	if err != nil {
+		fmt.Printf("Error sending slack notification: %v\n", err)
+		return server.Response(http.StatusInternalServerError, nil), fmt.Errorf("Unable to send slack notification: %v", err)
+	}
 
-	//TODO: Uncomment the next line to return response Response(200, string{}) or use other options such as http.Ok ...
-	//return Response(200, string{}), nil
-
-	//TODO: Uncomment the next line to return response Response(0, Error{}) or use other options such as http.Ok ...
-	//return Response(0, Error{}), nil
-
-	return server.Response(http.StatusNotImplemented, nil), errors.New("NotificationSubscribe method not implemented")
-}
-
-// NotificationUnsubscribe - Unsubscribe to notifications
-func (s *NotificationApiService) NotificationUnsubscribe(ctx context.Context, subscribeRequest server.SubscribeRequest) (server.ImplResponse, error) {
-	// TODO - update NotificationUnsubscribe with the required logic for this service method.
-	// Add api_notification_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, string{}) or use other options such as http.Ok ...
-	//return Response(200, string{}), nil
-
-	//TODO: Uncomment the next line to return response Response(0, Error{}) or use other options such as http.Ok ...
-	//return Response(0, Error{}), nil
-
-	return server.Response(http.StatusNotImplemented, nil), errors.New("NotificationUnsubscribe method not implemented")
-}
-
-// SendNotification - Send a notification
-func (s *NotificationApiService) SendNotification(ctx context.Context, notificationMessage server.NotificationMessage) (server.ImplResponse, error) {
-	// TODO - update SendNotification with the required logic for this service method.
-	// Add api_notification_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, string{}) or use other options such as http.Ok ...
-	//return Response(200, string{}), nil
-
-	//TODO: Uncomment the next line to return response Response(0, Error{}) or use other options such as http.Ok ...
-	//return Response(0, Error{}), nil
-
-	return server.Response(http.StatusNotImplemented, nil), errors.New("SendNotification method not implemented")
+	return server.Response(http.StatusOK, server.SendSlackMessageResponse{Timestamp: timestamp}), nil
 }

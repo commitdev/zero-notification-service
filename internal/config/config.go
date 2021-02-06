@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Port                    int
 	SendgridAPIKey          string
+	SlackAPIKey             string
 	GracefulShutdownTimeout time.Duration
 	StructuredLogging       bool
 }
@@ -20,6 +21,7 @@ const (
 	_ = string(rune(iota)) // We don't care about the values of these constants
 	Port
 	SendgridAPIKey
+	SlackAPIKey
 	GracefulShutdownTimeout
 	StructuredLogging
 )
@@ -39,6 +41,9 @@ func loadConfig() *Config {
 	viper.SetDefault(SendgridAPIKey, "")
 	viper.BindEnv(SendgridAPIKey, "SENDGRID_API_KEY")
 
+	viper.SetDefault(SlackAPIKey, "")
+	viper.BindEnv(SlackAPIKey, "SLACK_API_KEY")
+
 	viper.SetDefault(GracefulShutdownTimeout, "10")
 	viper.BindEnv(GracefulShutdownTimeout, "GRACEFUL_SHUTDOWN_TIMEOUT_SECONDS")
 
@@ -48,6 +53,7 @@ func loadConfig() *Config {
 	config := Config{
 		Port:                    viper.GetInt(Port),
 		SendgridAPIKey:          viper.GetString(SendgridAPIKey),
+		SlackAPIKey:             viper.GetString(SlackAPIKey),
 		GracefulShutdownTimeout: viper.GetDuration(GracefulShutdownTimeout),
 		StructuredLogging:       viper.GetBool(StructuredLogging),
 	}

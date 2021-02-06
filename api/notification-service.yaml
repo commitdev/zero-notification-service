@@ -74,11 +74,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-
-  /notification/send:
+  /notification/slack/send:
     post:
-      summary: Send a notification
-      operationId: sendNotification
+      summary: Send a Slack message
+      operationId: sendSlackNotification
       tags:
         - notification
       requestBody:
@@ -87,14 +86,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NotificationMessage'
+              $ref: '#/components/schemas/SendSlackMessageRequest'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SendNotificationResponse'
+                $ref: '#/components/schemas/SendSlackMessageResponse'
         default:
           description: unexpected error
           content:
@@ -102,64 +101,91 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /notification/subscribe:
-    post:
-      summary: Subscribe to notifications
-      operationId: notificationSubscribe
-      tags:
-        - notification
-      requestBody:
-        description: Parameters of the subscription
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubscribeRequest'
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: string
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+  # /notification/send:
+  #   post:
+  #     summary: Send a notification
+  #     operationId: sendNotification
+  #     tags:
+  #       - notification
+  #     requestBody:
+  #       description: Parameters of the message to send
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/SendNotificationRequest'
+  #     responses:
+  #       200:
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/SendNotificationResponse'
+  #       default:
+  #         description: unexpected error
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Error'
 
-  /notification/unsubscribe:
-    post:
-      summary: Unsubscribe to notifications
-      operationId: notificationUnsubscribe
-      tags:
-        - notification
-      requestBody:
-        description: Parameters of the unsubscription
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubscribeRequest'
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: string
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+  # /notification/subscribe:
+  #   post:
+  #     summary: Subscribe to notifications
+  #     operationId: notificationSubscribe
+  #     tags:
+  #       - notification
+  #     requestBody:
+  #       description: Parameters of the subscription
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/SubscribeRequest'
+  #     responses:
+  #       200:
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: string
+  #       default:
+  #         description: unexpected error
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Error'
+
+  # /notification/unsubscribe:
+  #   post:
+  #     summary: Unsubscribe to notifications
+  #     operationId: notificationUnsubscribe
+  #     tags:
+  #       - notification
+  #     requestBody:
+  #       description: Parameters of the unsubscription
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/SubscribeRequest'
+  #     responses:
+  #       200:
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: string
+  #       default:
+  #         description: unexpected error
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Error'
 
 components:
   schemas:
 
-    Recipient:
+    EmailRecipient:
       type: object
       required:
         - name
@@ -170,7 +196,7 @@ components:
         address:
           type: string
 
-    Sender:
+    EmailSender:
       type: object
       required:
         - name
@@ -188,9 +214,9 @@ components:
       - from
       properties:
         to:
-          $ref: '#/components/schemas/Recipient'
+          $ref: '#/components/schemas/EmailRecipient'
         from:
-          $ref: '#/components/schemas/Sender'
+          $ref: '#/components/schemas/EmailSender'
         message:
           $ref: '#/components/schemas/MailMessage'
 
@@ -203,9 +229,9 @@ components:
         toAddresses:
           type: array
           items:
-            $ref: '#/components/schemas/Recipient'
+            $ref: '#/components/schemas/EmailRecipient'
         from:
-          $ref: '#/components/schemas/Sender'
+          $ref: '#/components/schemas/EmailSender'
         message:
           $ref: '#/components/schemas/MailMessage'
 
@@ -228,36 +254,40 @@ components:
           description: Schedule these mesages to go out at the time specified by this UNIX timestamp
           format: int64
 
-    NotificationMessage:
+    SlackRecipient:
+      type: object
+      required:
+        - conversationId
+      properties:
+        conversationId:
+          type: string
+          description: The id of the channel or user to send the message to
+
+    SlackMessage:
+      type: object
+      properties:
+        body:
+          type: string
+          description: The body of the message to send
+
+    SendSlackMessageRequest:
       type: object
       required:
       - to
-      - subject
+      - message
       properties:
         to:
-          $ref: '#/components/schemas/Recipient'
-        subject:
-          type: string
-        body:
-          type: string
-        templateId:
+          $ref: '#/components/schemas/SlackRecipient'
+        message:
+          $ref: '#/components/schemas/SlackMessage'
+        replyToTimestamp:
           type: string
 
-    SubscribeRequest:
+    SendSlackMessageResponse:
       type: object
       properties:
-        topicId:
+        timestamp:
           type: string
-      required:
-        - topicId
-
-    UnsubscribeRequest:
-      type: object
-      properties:
-        topicId:
-          type: string
-      required:
-        - topicId
 
     SendMailResponse:
       type: object
@@ -292,11 +322,27 @@ components:
                 type: string
                 description: Error or response message returned by the mail provider
 
-    SendNotificationResponse:
-      type: object
-      properties:
-        trackingId:
-          type: string
+    # SendNotificationResponse:
+    #   type: object
+    #   properties:
+    #     trackingId:
+    #       type: string
+
+    # SubscribeRequest:
+    #   type: object
+    #   properties:
+    #     topicId:
+    #       type: string
+    #   required:
+    #     - topicId
+
+    # UnsubscribeRequest:
+    #   type: object
+    #   properties:
+    #     topicId:
+    #       type: string
+    #   required:
+    #     - topicId
 
     Error:
       type: object
