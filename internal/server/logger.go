@@ -37,18 +37,21 @@ func Logger(inner http.Handler, name string) http.Handler {
 		inner.ServeHTTP(lrw, r)
 
 		if config.GetConfig().StructuredLogging {
-			http := log.ECSHTTP{
-				Request: log.ECSRequest{
-					Method: r.Method,
-				},
-				Response: log.ECSResponse{
-					StatusCode: lrw.statusCode,
-				},
-			}
-			url := log.ECSURL{Original: r.RequestURI}
-			event := log.ECSEvent{Action: name, Duration: time.Since(start)}
+			// Don't log health checks in a cloud environment - name is defined in the schema
+			if name != "ReadyCheck" {
+				http := log.ECSHTTP{
+					Request: log.ECSRequest{
+						Method: r.Method,
+					},
+					Response: log.ECSResponse{
+						StatusCode: lrw.statusCode,
+					},
+				}
+				url := log.ECSURL{Original: r.RequestURI}
+				event := log.ECSEvent{Action: name, Duration: time.Since(start)}
 
-			zap.S().Infow("HTTP Request", zap.Any("http", http), zap.Any("url", url), zap.Any("event", event))
+				zap.S().Infow("HTTP Request", zap.Any("http", http), zap.Any("url", url), zap.Any("event", event))
+			}
 		} else {
 			zap.S().Infow("HTTP Request",
 				"method", r.Method,
