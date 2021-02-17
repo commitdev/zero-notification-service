@@ -11,7 +11,6 @@ package server
 
 import (
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/commitdev/zero-notification-service/internal/config"
@@ -38,8 +37,8 @@ func Logger(inner http.Handler, name string) http.Handler {
 		inner.ServeHTTP(lrw, r)
 
 		if config.GetConfig().StructuredLogging {
-			// Don't log health checks in a cloud environment
-			if !strings.HasPrefix(r.RequestURI, "/v1/status/") {
+			// Don't log health checks in a cloud environment - name is defined in the schema
+			if name != "ReadyCheck" {
 				http := log.ECSHTTP{
 					Request: log.ECSRequest{
 						Method: r.Method,
