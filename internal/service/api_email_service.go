@@ -9,6 +9,7 @@ import (
 	"github.com/commitdev/zero-notification-service/internal/mail"
 	"github.com/commitdev/zero-notification-service/internal/server"
 	"github.com/sendgrid/sendgrid-go"
+	"go.uber.org/zap"
 )
 
 // EmailApiService is a service that implents the logic for the EmailApiServicer
@@ -26,15 +27,16 @@ func NewEmailApiService(c *config.Config) server.EmailApiServicer {
 // SendEmail - Send an email
 func (s *EmailApiService) SendEmail(ctx context.Context, sendMailRequest server.SendMailRequest) (server.ImplResponse, error) {
 	client := sendgrid.NewSendClient(s.config.SendgridAPIKey)
-	response, err := mail.SendIndividualMail(sendMailRequest.To, sendMailRequest.From, sendMailRequest.Message, client)
+	response, err := mail.SendIndividualMail(sendMailRequest.ToAddresses, sendMailRequest.FromAddress, sendMailRequest.CcAddresses, sendMailRequest.BccAddresses, sendMailRequest.Message, client)
 
 	if err != nil {
-		fmt.Printf("Error sending mail: %v\n", response)
+		zap.S().Errorf("Error sending mail: %v", response)
+
 		return server.Response(http.StatusInternalServerError, nil), fmt.Errorf("Unable to send email: %v", err)
 	}
 
 	if !(response.StatusCode >= 200 && response.StatusCode <= 299) {
-		fmt.Printf("Failure from Sendgrid when sending mail: %v\n", response)
+		zap.S().Errorf("Failure from Sendgrid when sending mail: %v", response)
 		return server.Response(http.StatusInternalServerError, nil), fmt.Errorf("Unable to send email: %v from mail provider: %v", response.StatusCode, response.Body)
 	}
 
@@ -47,7 +49,7 @@ func (s *EmailApiService) SendBulk(ctx context.Context, sendBulkMailRequest serv
 
 	responseChannel := make(chan mail.BulkSendAttempt)
 
-	mail.SendBulkMail(sendBulkMailRequest.ToAddresses, sendBulkMailRequest.From, sendBulkMailRequest.Message, client, responseChannel)
+	mail.SendBulkMail(sendBulkMailRequest.ToAddresses, sendBulkMailRequest.FromAddress, sendBulkMailRequest.CcAddresses, sendBulkMailRequest.BccAddresses, sendBulkMailRequest.Message, client, responseChannel)
 
 	var successful []server.SendBulkMailResponseSuccessful
 	var failed []server.SendBulkMailResponseFailed
@@ -55,10 +57,10 @@ func (s *EmailApiService) SendBulk(ctx context.Context, sendBulkMailRequest serv
 	// Read all the responses from the channel. This will block if responses aren't ready and the channel is not yet closed
 	for r := range responseChannel {
 		if r.Error != nil {
-			fmt.Printf("Error sending bulk mail: %v", r.Error)
+			zap.S().Errorf("Error sending bulk mail: %v", r.Error)
 			failed = append(failed, server.SendBulkMailResponseFailed{EmailAddress: r.EmailAddress, Error: fmt.Sprintf("Unable to send email: %v\n", r.Error)})
 		} else if !(r.Response.StatusCode >= 200 && r.Response.StatusCode <= 299) {
-			fmt.Printf("Failure from Sendgrid when sending bulk mail: %v", r.Response)
+			zap.S().Errorf("Failure from Sendgrid when sending bulk mail: %v", r.Response)
 			failed = append(failed, server.SendBulkMailResponseFailed{EmailAddress: r.EmailAddress, Error: fmt.Sprintf("Unable to send email: %v from mail provider: %v\n", r.Response.StatusCode, r.Response.Body)})
 		} else {
 			successful = append(successful, server.SendBulkMailResponseSuccessful{EmailAddress: r.EmailAddress, TrackingId: r.Response.Headers["X-Message-Id"][0]})
