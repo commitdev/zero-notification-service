@@ -292,6 +292,12 @@ components:
         message:
           type: string
 
+    SendSMSResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
     SlackRecipient:
       type: object
       required:

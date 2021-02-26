@@ -55,7 +55,7 @@ func (s *SmsApiService) SendSMS(ctx context.Context, sendSMSRequest server.SendS
 	}
 	if !(resp.StatusCode >= 200 && resp.StatusCode <= 299) {
 		fmt.Printf("Failure from Twilio when sending SMS: %v", resp)
-		return server.Response(http.StatusBadRequest, "Error sending SMS"), nil
+		return server.Response(http.StatusBadRequest, server.SendSmsResponse{Message: "Error sending SMS"}), nil
 	}
-	return server.Response(http.StatusOK, "SMS Sent"), nil
+	return server.Response(http.StatusOK, server.SendSmsResponse{Message: "SMS Sent"}), nil
 }
