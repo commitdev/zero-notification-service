@@ -22,7 +22,10 @@ paths:
 
   /email/send:
     post:
-      summary: Send an email
+      summary: |
+        Send a single email.
+        Note that if multiple to addresses are provided it will still only send a single email with multiple addresses in the to field.
+        To send multiple emails to individual addresses, see the sendBulk endpoint.
       operationId: sendEmail
       tags:
         - email
@@ -49,7 +52,10 @@ paths:
 
   /email/sendBulk:
     post:
-      summary: Send a batch of emails to many users with the same content. Note that it is possible for only a subset of these to fail.
+      summary: |
+        Send a batch of multiple emails to individual recipients with the same content.
+        Note that if cc or bcc address are provided, each email sent will also be sent to any addresses in these lists.
+        Note that it is possible for only a subset of these to fail
       operationId: sendBulk
       tags:
         - email
@@ -210,12 +216,22 @@ components:
     SendMailRequest:
       type: object
       required:
-      - to
-      - from
+      - toAddresses
+      - fromAddress
       properties:
-        to:
-          $ref: '#/components/schemas/EmailRecipient'
-        from:
+        toAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailRecipient'
+        ccAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailRecipient'
+        bccAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailRecipient'
+        fromAddress:
           $ref: '#/components/schemas/EmailSender'
         message:
           $ref: '#/components/schemas/MailMessage'
@@ -224,13 +240,21 @@ components:
       type: object
       required:
       - toAddresses
-      - from
+      - fromAddresses
       properties:
         toAddresses:
           type: array
           items:
             $ref: '#/components/schemas/EmailRecipient'
-        from:
+        ccAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailRecipient'
+        bccAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailRecipient'
+        fromAddress:
           $ref: '#/components/schemas/EmailSender'
         message:
           $ref: '#/components/schemas/MailMessage'

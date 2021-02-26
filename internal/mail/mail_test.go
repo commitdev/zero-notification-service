@@ -35,6 +35,8 @@ func TestSendBulkMail(t *testing.T) {
 			Address: fmt.Sprintf("address%d@domain.com", i),
 		})
 	}
+	cc := make([]server.EmailRecipient, 0)
+	bcc := make([]server.EmailRecipient, 0)
 	from := server.EmailSender{Name: "Test User", Address: "address@domain.com"}
 	message := server.MailMessage{Subject: "Subject", Body: "Body"}
 	client := FakeClient{}
@@ -42,7 +44,7 @@ func TestSendBulkMail(t *testing.T) {
 	client.On("Send").Return(nil, nil)
 
 	responseChannel := make(chan mail.BulkSendAttempt)
-	mail.SendBulkMail(toList, from, message, &client, responseChannel)
+	mail.SendBulkMail(toList, from, cc, bcc, message, &client, responseChannel)
 
 	// Range over the channel until empty
 	returnedCount := 0

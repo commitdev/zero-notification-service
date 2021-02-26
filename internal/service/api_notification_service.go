@@ -9,6 +9,7 @@ import (
 	"github.com/commitdev/zero-notification-service/internal/notification/slack"
 	"github.com/commitdev/zero-notification-service/internal/server"
 	slack_lib "github.com/slack-go/slack"
+	"go.uber.org/zap"
 )
 
 // NotificationApiService is a service that implents the logic for the NotificationApiServicer
@@ -28,7 +29,7 @@ func (s *NotificationApiService) SendSlackNotification(ctx context.Context, send
 	client := slack_lib.New(s.config.SlackAPIKey)
 	timestamp, err := slack.SendMessage(sendSlackMessageRequest.To, sendSlackMessageRequest.Message, sendSlackMessageRequest.ReplyToTimestamp, client)
 	if err != nil {
-		fmt.Printf("Error sending slack notification: %v\n", err)
+		zap.S().Errorf("Error sending slack notification: %v", err)
 		return server.Response(http.StatusInternalServerError, nil), fmt.Errorf("Unable to send slack notification: %v", err)
 	}
 
