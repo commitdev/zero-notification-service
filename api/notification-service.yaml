@@ -240,7 +240,7 @@ components:
       type: object
       required:
       - toAddresses
-      - fromAddresses
+      - fromAddress
       properties:
         toAddresses:
           type: array
