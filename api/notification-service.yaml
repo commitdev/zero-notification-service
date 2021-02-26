@@ -3,7 +3,7 @@ info:
   version: 1.0.0
   title: Zero Notification Service
 servers:
-  - url: http://zero.commit.dev/v1
+  - url: http://zero-notification-service.notification-service/v1
 
 paths:
   /status/ready:
