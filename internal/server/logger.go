@@ -11,6 +11,7 @@ package server
 
 import (
 	"net/http"
+	"net/http/httputil"
 	"time"
 
 	"github.com/commitdev/zero-notification-service/internal/config"
@@ -32,6 +33,15 @@ func (lrw *loggingResponseWriter) WriteHeader(code int) {
 func Logger(inner http.Handler, name string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
+
+		// If configured, dump the content of the request for debugging
+		if config.GetConfig().DebugDumpRequests {
+			requestDump, err := httputil.DumpRequest(r, true)
+			if err != nil {
+				zap.S().Errorw("Error getting request content", err)
+			}
+			zap.S().Debugw("HTTP Request Content", zap.ByteString("content", requestDump))
+		}
 
 		lrw := &loggingResponseWriter{w, http.StatusOK}
 		inner.ServeHTTP(lrw, r)
