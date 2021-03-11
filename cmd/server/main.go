@@ -50,7 +50,7 @@ func main() {
 	NotificationApiService := service.NewNotificationApiService(config)
 	NotificationApiController := server.NewNotificationApiController(NotificationApiService)
 
-	router := server.NewRouter(EmailApiController, HealthApiController, NotificationApiController)
+	router := server.Logger(server.NewRouter(EmailApiController, HealthApiController, NotificationApiController), "")
 
 	serverAddress := fmt.Sprintf("0.0.0.0:%d", config.Port)
 	server := &http.Server{Addr: serverAddress, Handler: router}

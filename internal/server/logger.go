@@ -36,6 +36,11 @@ func Logger(inner http.Handler, name string) http.Handler {
 		lrw := &loggingResponseWriter{w, http.StatusOK}
 		inner.ServeHTTP(lrw, r)
 
+		// Use the global handler for 4xx status codes, as there won't be a route-specific one
+		if !(lrw.statusCode >= 400 && lrw.statusCode <= 499) && name == "" {
+			return
+		}
+
 		if config.GetConfig().StructuredLogging {
 			// Don't log health checks in a cloud environment - name is defined in the schema
 			if name != "ReadyCheck" {
@@ -49,8 +54,9 @@ func Logger(inner http.Handler, name string) http.Handler {
 				}
 				url := log.ECSURL{Original: r.RequestURI}
 				event := log.ECSEvent{Action: name, Duration: time.Since(start)}
+				trace := log.ECSTrace{ID: r.Header.Get("X-Request-ID")}
 
-				zap.S().Infow("HTTP Request", zap.Any("http", http), zap.Any("url", url), zap.Any("event", event))
+				zap.S().Infow("HTTP Request", zap.Any("http", http), zap.Any("url", url), zap.Any("event", event), zap.Any("trace", trace))
 			}
 		} else {
 			zap.S().Infow("HTTP Request",
@@ -59,6 +65,7 @@ func Logger(inner http.Handler, name string) http.Handler {
 				"url", r.RequestURI,
 				"action", name,
 				"duration", time.Since(start),
+				"request_id", r.Header.Get("X-Request-ID"),
 			)
 		}
 	})
