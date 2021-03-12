@@ -13,6 +13,7 @@ type Config struct {
 	SlackAPIKey             string
 	GracefulShutdownTimeout time.Duration
 	StructuredLogging       bool
+	AllowEmailToDomains     []string
 }
 
 var config *Config
@@ -24,6 +25,7 @@ const (
 	SlackAPIKey
 	GracefulShutdownTimeout
 	StructuredLogging
+	AllowEmailToDomains
 )
 
 // GetConfig returns a pointer to the singleton Config object
@@ -50,12 +52,16 @@ func loadConfig() *Config {
 	viper.SetDefault(StructuredLogging, "false")
 	viper.BindEnv(StructuredLogging, "STRUCTURED_LOGGING")
 
+	viper.SetDefault(AllowEmailToDomains, []string{})
+	viper.BindEnv(AllowEmailToDomains, "ALLOW_EMAIL_TO_DOMAINS")
+
 	config := Config{
 		Port:                    viper.GetInt(Port),
 		SendgridAPIKey:          viper.GetString(SendgridAPIKey),
 		SlackAPIKey:             viper.GetString(SlackAPIKey),
 		GracefulShutdownTimeout: viper.GetDuration(GracefulShutdownTimeout),
 		StructuredLogging:       viper.GetBool(StructuredLogging),
+		AllowEmailToDomains:     viper.GetStringSlice(AllowEmailToDomains),
 	}
 
 	return &config

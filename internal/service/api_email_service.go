@@ -26,6 +26,20 @@ func NewEmailApiService(c *config.Config) server.EmailApiServicer {
 
 // SendEmail - Send an email
 func (s *EmailApiService) SendEmail(ctx context.Context, sendMailRequest server.SendMailRequest) (server.ImplResponse, error) {
+
+	// Check if there are valid recipients who are not in the restriction list
+	if len(s.config.AllowEmailToDomains) > 0 {
+		originalAddresses := sendMailRequest.ToAddresses
+		sendMailRequest.ToAddresses = mail.RemoveInvalidRecipients(sendMailRequest.ToAddresses, s.config.AllowEmailToDomains)
+		// If there are none, return with a 200 but don't send anything
+		if len(sendMailRequest.ToAddresses) == 0 {
+			zap.S().Infow("No valid Recipients for send", zap.Any("original_addresses", originalAddresses))
+			return server.Response(http.StatusOK, server.SendMailResponse{TrackingId: "No valid recipients"}), nil
+		}
+	}
+	sendMailRequest.CcAddresses = mail.RemoveInvalidRecipients(sendMailRequest.CcAddresses, s.config.AllowEmailToDomains)
+	sendMailRequest.BccAddresses = mail.RemoveInvalidRecipients(sendMailRequest.BccAddresses, s.config.AllowEmailToDomains)
+
 	client := sendgrid.NewSendClient(s.config.SendgridAPIKey)
 	response, err := mail.SendIndividualMail(sendMailRequest.ToAddresses, sendMailRequest.FromAddress, sendMailRequest.CcAddresses, sendMailRequest.BccAddresses, sendMailRequest.Message, client)
 
@@ -45,6 +59,20 @@ func (s *EmailApiService) SendEmail(ctx context.Context, sendMailRequest server.
 
 // SendBulk - Send a batch of emails to many users with the same content. Note that it is possible for only a subset of these to fail.
 func (s *EmailApiService) SendBulk(ctx context.Context, sendBulkMailRequest server.SendBulkMailRequest) (server.ImplResponse, error) {
+	// Check if there are valid recipients who are not in the restriction list
+	if len(s.config.AllowEmailToDomains) > 0 {
+		originalAddresses := sendBulkMailRequest.ToAddresses
+		sendBulkMailRequest.ToAddresses = mail.RemoveInvalidRecipients(sendBulkMailRequest.ToAddresses, s.config.AllowEmailToDomains)
+
+		// If there are none, return with a 200 but don't send anything
+		if len(sendBulkMailRequest.ToAddresses) == 0 {
+			zap.S().Infow("No valid Recipients for bulk send", zap.Any("original_addresses", originalAddresses))
+			return server.Response(http.StatusOK, server.SendMailResponse{TrackingId: "No valid recipients"}), nil
+		}
+	}
+	sendBulkMailRequest.CcAddresses = mail.RemoveInvalidRecipients(sendBulkMailRequest.CcAddresses, s.config.AllowEmailToDomains)
+	sendBulkMailRequest.BccAddresses = mail.RemoveInvalidRecipients(sendBulkMailRequest.BccAddresses, s.config.AllowEmailToDomains)
+
 	client := sendgrid.NewSendClient(s.config.SendgridAPIKey)
 
 	responseChannel := make(chan mail.BulkSendAttempt)
