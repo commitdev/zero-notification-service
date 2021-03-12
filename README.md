@@ -21,6 +21,18 @@ make docker
 make docker-run
 ```
 
+### Configuration
+A number of environment variables are available to configure the service at runtime:
+| Env var name | Functionality | Default |
+|--------------|---------------|---------|
+| SERVICE_PORT                      | The local port the application will bind to | 80 |
+| SENDGRID_API_KEY                  | The API Key for sendgrid | |
+| SLACK_API_KEY                     | The API Token for Slack | |
+| GRACEFUL_SHUTDOWN_TIMEOUT_SECONDS | The number of seconds the application will continue servicing in-flight requests before the application stops after it receives an interrupt signal | 10 |
+| STRUCTURED_LOGGING                | If enabled, logs will be in JSON format, and only above INFO level | false |
+| ALLOW_EMAIL_TO_DOMAINS            | A comma separated list of domains. Only addresses in this list can have email sent to them. If empty, disable this "sandboxing" functionality. | |
+
+
 ### Releasing a new version on GitHub and Brew
 
 We are using a tool called `goreleaser` which you can get from brew if you're on MacOS:

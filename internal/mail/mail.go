@@ -1,6 +1,8 @@
 package mail
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/commitdev/zero-notification-service/internal/server"
@@ -80,4 +82,25 @@ func convertAddresses(addresses []server.EmailRecipient) []*sendgridMail.Email {
 		returnAddresses[i] = sendgridMail.NewEmail(address.Name, address.Address)
 	}
 	return returnAddresses
+}
+
+// RemoveInvalidRecipients accepts a list of recipients and removes the ones with domains not in the allowed list
+func RemoveInvalidRecipients(recipients []server.EmailRecipient, allowedDomains []string) []server.EmailRecipient {
+	valid := []server.EmailRecipient{}
+	for _, recipient := range recipients {
+		if addressInAllowedDomain(recipient.Address, allowedDomains) {
+			valid = append(valid, recipient)
+		}
+	}
+	return valid
+}
+
+// addressInAllowedDomain checks if a single email address is in a list of domains
+func addressInAllowedDomain(address string, domains []string) bool {
+	for _, domain := range domains {
+		if strings.HasSuffix(address, fmt.Sprintf("@%s", domain)) {
+			return true
+		}
+	}
+	return false
 }

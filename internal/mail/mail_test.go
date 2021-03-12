@@ -25,16 +25,7 @@ func (cl *FakeClient) Send(email *sendgridMail.SGMailV3) (*rest.Response, error)
 }
 
 func TestSendBulkMail(t *testing.T) {
-	var toList []server.EmailRecipient
-	// Create a random number of mails
-	rand.Seed(time.Now().UnixNano())
-	sendCount := rand.Intn(5) + 2
-	for i := 0; i < sendCount; i++ {
-		toList = append(toList, server.EmailRecipient{
-			Name:    fmt.Sprintf("Test Recipient %d", i),
-			Address: fmt.Sprintf("address%d@domain.com", i),
-		})
-	}
+	toList := createRandomRecipients(2, 5)
 	cc := make([]server.EmailRecipient, 0)
 	bcc := make([]server.EmailRecipient, 0)
 	from := server.EmailSender{Name: "Test User", Address: "address@domain.com"}
@@ -52,8 +43,37 @@ func TestSendBulkMail(t *testing.T) {
 		returnedCount++
 	}
 
-	assert.Equal(t, sendCount, returnedCount, "Response count should match requests sent")
+	assert.Equal(t, len(toList), returnedCount, "Response count should match requests sent")
 
 	// Check that the send function was called
-	client.AssertNumberOfCalls(t, "Send", sendCount)
+	client.AssertNumberOfCalls(t, "Send", len(toList))
+}
+
+func TestRemoveInvalidRecipients(t *testing.T) {
+	toList := createRandomRecipients(2, 5)
+
+	originalSize := len(toList)
+
+	toList[0].Address = "address@commit.dev"
+
+	alteredList := mail.RemoveInvalidRecipients(toList, []string{"commit.dev", "domain.com"})
+	assert.Equal(t, len(alteredList), originalSize, "All addresses should remain in the list")
+
+	alteredList = mail.RemoveInvalidRecipients(toList, []string{"commit.dev"})
+	assert.Equal(t, len(alteredList), 1, "1 address should remain in the list")
+}
+
+// createRandomRecipients creates a random list of recipients
+func createRandomRecipients(min int, randCount int) []server.EmailRecipient {
+	var toList []server.EmailRecipient
+	// Create a random number of mails
+	rand.Seed(time.Now().UnixNano())
+	sendCount := rand.Intn(randCount) + min
+	for i := 0; i < sendCount; i++ {
+		toList = append(toList, server.EmailRecipient{
+			Name:    fmt.Sprintf("Test Recipient %d", i),
+			Address: fmt.Sprintf("address%d@domain.com", i),
+		})
+	}
+	return toList
 }

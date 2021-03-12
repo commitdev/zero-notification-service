@@ -14,6 +14,7 @@ type Config struct {
 	GracefulShutdownTimeout time.Duration
 	StructuredLogging       bool
 	DebugDumpRequests       bool
+	AllowEmailToDomains     []string
 }
 
 var config *Config
@@ -26,6 +27,7 @@ const (
 	GracefulShutdownTimeout
 	StructuredLogging
 	DebugDumpRequests
+	AllowEmailToDomains
 )
 
 // GetConfig returns a pointer to the singleton Config object
@@ -55,6 +57,9 @@ func loadConfig() *Config {
 	viper.SetDefault(DebugDumpRequests, "false")
 	viper.BindEnv(DebugDumpRequests, "DEBUG_DUMP_REQUESTS")
 
+	viper.SetDefault(AllowEmailToDomains, []string{})
+	viper.BindEnv(AllowEmailToDomains, "ALLOW_EMAIL_TO_DOMAINS")
+
 	config := Config{
 		Port:                    viper.GetInt(Port),
 		SendgridAPIKey:          viper.GetString(SendgridAPIKey),
@@ -62,6 +67,7 @@ func loadConfig() *Config {
 		GracefulShutdownTimeout: viper.GetDuration(GracefulShutdownTimeout),
 		StructuredLogging:       viper.GetBool(StructuredLogging),
 		DebugDumpRequests:       viper.GetBool(DebugDumpRequests),
+		AllowEmailToDomains:     viper.GetStringSlice(AllowEmailToDomains),
 	}
 
 	return &config
