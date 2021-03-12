@@ -7,7 +7,7 @@ builds:
   env:
   - CGO_ENABLED=0
   ldflags:
-    - -X github.com/commitdev/zero-notification-service/cmd.appVersion={{.Version}} -X github.com/commitdev/zero-notification-service/cmd.appBuild={{.ShortCommit}}
+    - -X main.appVersion={{.Version}} -X  main.appBuild={{.ShortCommit}}
   ignore:
     - goos: darwin
       goarch: arm64

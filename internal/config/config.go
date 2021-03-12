@@ -1,6 +1,7 @@
 package config
 
 import (
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -60,6 +61,12 @@ func loadConfig() *Config {
 	viper.SetDefault(AllowEmailToDomains, []string{})
 	viper.BindEnv(AllowEmailToDomains, "ALLOW_EMAIL_TO_DOMAINS")
 
+	// Split the string on commas, viper doesn't support doing this to env vars
+	domains := []string{}
+	if viper.GetString(AllowEmailToDomains) != "" {
+		domains = strings.Split(viper.GetString(AllowEmailToDomains), ",")
+	}
+
 	config := Config{
 		Port:                    viper.GetInt(Port),
 		SendgridAPIKey:          viper.GetString(SendgridAPIKey),
@@ -67,7 +74,7 @@ func loadConfig() *Config {
 		GracefulShutdownTimeout: viper.GetDuration(GracefulShutdownTimeout),
 		StructuredLogging:       viper.GetBool(StructuredLogging),
 		DebugDumpRequests:       viper.GetBool(DebugDumpRequests),
-		AllowEmailToDomains:     viper.GetStringSlice(AllowEmailToDomains),
+		AllowEmailToDomains:     domains,
 	}
 
 	return &config
