@@ -38,6 +38,10 @@ func main() {
 
 	zap.S().Infow("zero-notification-service", "version", appVersion, "build", appBuild)
 
+	if len(config.AllowEmailToDomains) > 0 {
+		zap.S().Infow("Allowing email only to specified domains", "domains", config.AllowEmailToDomains)
+	}
+
 	// Heartbeat for liveness check
 	go heartbeat()
 
