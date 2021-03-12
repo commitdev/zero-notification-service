@@ -13,6 +13,7 @@ type Config struct {
 	SlackAPIKey             string
 	GracefulShutdownTimeout time.Duration
 	StructuredLogging       bool
+	DebugDumpRequests       bool
 	AllowEmailToDomains     []string
 }
 
@@ -25,6 +26,7 @@ const (
 	SlackAPIKey
 	GracefulShutdownTimeout
 	StructuredLogging
+	DebugDumpRequests
 	AllowEmailToDomains
 )
 
@@ -52,6 +54,9 @@ func loadConfig() *Config {
 	viper.SetDefault(StructuredLogging, "false")
 	viper.BindEnv(StructuredLogging, "STRUCTURED_LOGGING")
 
+	viper.SetDefault(DebugDumpRequests, "false")
+	viper.BindEnv(DebugDumpRequests, "DEBUG_DUMP_REQUESTS")
+
 	viper.SetDefault(AllowEmailToDomains, []string{})
 	viper.BindEnv(AllowEmailToDomains, "ALLOW_EMAIL_TO_DOMAINS")
 
@@ -61,6 +66,7 @@ func loadConfig() *Config {
 		SlackAPIKey:             viper.GetString(SlackAPIKey),
 		GracefulShutdownTimeout: viper.GetDuration(GracefulShutdownTimeout),
 		StructuredLogging:       viper.GetBool(StructuredLogging),
+		DebugDumpRequests:       viper.GetBool(DebugDumpRequests),
 		AllowEmailToDomains:     viper.GetStringSlice(AllowEmailToDomains),
 	}
 

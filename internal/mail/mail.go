@@ -88,7 +88,6 @@ func convertAddresses(addresses []server.EmailRecipient) []*sendgridMail.Email {
 func RemoveInvalidRecipients(recipients []server.EmailRecipient, allowedDomains []string) []server.EmailRecipient {
 	valid := []server.EmailRecipient{}
 	for _, recipient := range recipients {
-
 		if addressInAllowedDomain(recipient.Address, allowedDomains) {
 			valid = append(valid, recipient)
 		}
