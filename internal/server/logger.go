@@ -11,6 +11,7 @@ package server
 
 import (
 	"net/http"
+	"net/http/httputil"
 	"time"
 
 	"github.com/commitdev/zero-notification-service/internal/config"
@@ -33,8 +34,22 @@ func Logger(inner http.Handler, name string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
+		// If configured, dump the content of the request for debugging
+		if config.GetConfig().DebugDumpRequests {
+			requestDump, err := httputil.DumpRequest(r, true)
+			if err != nil {
+				zap.S().Errorw("Error getting request content", err)
+			}
+			zap.S().Debugw("HTTP Request Content", zap.ByteString("content", requestDump))
+		}
+
 		lrw := &loggingResponseWriter{w, http.StatusOK}
 		inner.ServeHTTP(lrw, r)
+
+		// Use the global handler for 4xx status codes, as there won't be a route-specific one
+		if !(lrw.statusCode >= 400 && lrw.statusCode <= 499) && name == "" {
+			return
+		}
 
 		if config.GetConfig().StructuredLogging {
 			// Don't log health checks in a cloud environment - name is defined in the schema
@@ -49,8 +64,9 @@ func Logger(inner http.Handler, name string) http.Handler {
 				}
 				url := log.ECSURL{Original: r.RequestURI}
 				event := log.ECSEvent{Action: name, Duration: time.Since(start)}
+				trace := log.ECSTrace{ID: r.Header.Get("X-Request-ID")}
 
-				zap.S().Infow("HTTP Request", zap.Any("http", http), zap.Any("url", url), zap.Any("event", event))
+				zap.S().Infow("HTTP Request", zap.Any("http", http), zap.Any("url", url), zap.Any("event", event), zap.Any("trace", trace))
 			}
 		} else {
 			zap.S().Infow("HTTP Request",
@@ -59,6 +75,7 @@ func Logger(inner http.Handler, name string) http.Handler {
 				"url", r.RequestURI,
 				"action", name,
 				"duration", time.Since(start),
+				"request_id", r.Header.Get("X-Request-ID"),
 			)
 		}
 	})

@@ -60,3 +60,13 @@ func (o ECSEvent) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddInt64("duration", int64(o.Duration))
 	return nil
 }
+
+// ECSTrace represents a subset of the fields of the ECS Trace object
+type ECSTrace struct {
+	ID string
+}
+
+func (o ECSTrace) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	enc.AddString("id", o.ID)
+	return nil
+}
