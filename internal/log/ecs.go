@@ -61,7 +61,7 @@ func (o ECSEvent) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	return nil
 }
 
-// ECSEvent represents a subset of the fields of the ECS Trace object
+// ECSTrace represents a subset of the fields of the ECS Trace object
 type ECSTrace struct {
 	ID string
 }
