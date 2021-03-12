@@ -6,3 +6,4 @@ data:
     SERVICE_PORT: "{{ .Values.service.port }}"
     GRACEFUL_SHUTDOWN_TIMEOUT_SECONDS: "{{ .Values.application.gracefulShutdownTimeout }}"
     STRUCTURED_LOGGING: "{{ .Values.application.structuredLogging }}"
+    ALLOW_EMAIL_TO_DOMAINS: "{{ .Values.application.allowEmailToDomains }}"

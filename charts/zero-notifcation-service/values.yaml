@@ -76,9 +76,11 @@ affinity: {}
 
 
 # Application Config
+# See project readme for more information about config options
 
 application:
   sendgridApiKey:
   slackApiKey:
   gracefulShutdownTimeout: 10
   structuredLogging: true
+  allowEmailToDomains:
