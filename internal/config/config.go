@@ -63,8 +63,11 @@ func loadConfig() *Config {
 
 	// Split the string on commas, viper doesn't support doing this to env vars
 	domains := []string{}
-	if viper.GetString(AllowEmailToDomains) != "" {
+	if strings.Trim(viper.GetString(AllowEmailToDomains), " ") != "" {
 		domains = strings.Split(viper.GetString(AllowEmailToDomains), ",")
+		for i, domain := range domains {
+			domains[i] = strings.Trim(domain, " ")
+		}
 	}
 
 	config := Config{
