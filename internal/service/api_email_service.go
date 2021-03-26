@@ -70,9 +70,10 @@ func (s *EmailApiService) SendBulk(ctx context.Context, sendBulkMailRequest serv
 			zap.S().Infow("No valid Recipients for bulk send", zap.Any("original_addresses", originalAddresses))
 			return server.Response(http.StatusOK, server.SendMailResponse{TrackingId: "No valid recipients"}), nil
 		}
+
+		sendBulkMailRequest.CcAddresses = mail.RemoveInvalidRecipients(sendBulkMailRequest.CcAddresses, s.config.AllowEmailToDomains)
+		sendBulkMailRequest.BccAddresses = mail.RemoveInvalidRecipients(sendBulkMailRequest.BccAddresses, s.config.AllowEmailToDomains)
 	}
-	sendBulkMailRequest.CcAddresses = mail.RemoveInvalidRecipients(sendBulkMailRequest.CcAddresses, s.config.AllowEmailToDomains)
-	sendBulkMailRequest.BccAddresses = mail.RemoveInvalidRecipients(sendBulkMailRequest.BccAddresses, s.config.AllowEmailToDomains)
 
 	client := sendgrid.NewSendClient(s.config.SendgridAPIKey)
 
