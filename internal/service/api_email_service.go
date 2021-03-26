@@ -36,9 +36,10 @@ func (s *EmailApiService) SendEmail(ctx context.Context, sendMailRequest server.
 			zap.S().Infow("No valid Recipients for send", zap.Any("original_addresses", originalAddresses))
 			return server.Response(http.StatusOK, server.SendMailResponse{TrackingId: "No valid recipients"}), nil
 		}
+
+		sendMailRequest.CcAddresses = mail.RemoveInvalidRecipients(sendMailRequest.CcAddresses, s.config.AllowEmailToDomains)
+		sendMailRequest.BccAddresses = mail.RemoveInvalidRecipients(sendMailRequest.BccAddresses, s.config.AllowEmailToDomains)
 	}
-	sendMailRequest.CcAddresses = mail.RemoveInvalidRecipients(sendMailRequest.CcAddresses, s.config.AllowEmailToDomains)
-	sendMailRequest.BccAddresses = mail.RemoveInvalidRecipients(sendMailRequest.BccAddresses, s.config.AllowEmailToDomains)
 
 	client := sendgrid.NewSendClient(s.config.SendgridAPIKey)
 	response, err := mail.SendIndividualMail(sendMailRequest.ToAddresses, sendMailRequest.FromAddress, sendMailRequest.CcAddresses, sendMailRequest.BccAddresses, sendMailRequest.Message, client)
