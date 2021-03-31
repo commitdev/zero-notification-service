@@ -51,6 +51,15 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 2
+          # Some time before the termination signal is sent where the pod will be in a terminating statue and shouldn't receive traffic
+          # to reduce race conditions where the ingress sends a request to a service that is terminating
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - /bin/sh
+                - -c
+                - sleep 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           envFrom:
@@ -70,3 +79,5 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      # Prestop from above plus supplied grace period plus a small buffer
+      terminationGracePeriodSeconds: {{ add 7 .Values.application.gracefulShutdownTimeout }}
