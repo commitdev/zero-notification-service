@@ -31,6 +31,9 @@ A number of environment variables are available to configure the service at runt
 | GRACEFUL_SHUTDOWN_TIMEOUT_SECONDS | The number of seconds the application will continue servicing in-flight requests before the application stops after it receives an interrupt signal | 10 |
 | STRUCTURED_LOGGING                | If enabled, logs will be in JSON format, and only above INFO level | false |
 | ALLOW_EMAIL_TO_DOMAINS            | A comma separated list of domains. Only addresses in this list can have email sent to them. If empty, disable this "sandboxing" functionality. | |
+| TWILIO_ACCOUNT_ID                 | The Account ID for Twilio | |
+| TWILIO_AUTH_TOKEN                 | The Account Auth Token for Twilio | |
+| TWILIO_PHONE_NUMBER               | The Assigned Twilio Phone Number | |
 
 
 ### Releasing a new version on GitHub and Brew

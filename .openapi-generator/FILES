@@ -6,6 +6,8 @@ internal/server/api_health.go
 internal/server/api_health_service.go
 internal/server/api_notification.go
 internal/server/api_notification_service.go
+internal/server/api_sms.go
+internal/server/api_sms_service.go
 internal/server/helpers.go
 internal/server/impl.go
 internal/server/model_email_recipient.go
@@ -20,6 +22,8 @@ internal/server/model_send_mail_request.go
 internal/server/model_send_mail_response.go
 internal/server/model_send_slack_message_request.go
 internal/server/model_send_slack_message_response.go
+internal/server/model_send_sms_request.go
+internal/server/model_send_sms_response.go
 internal/server/model_slack_message.go
 internal/server/model_slack_recipient.go
 internal/server/routers.go

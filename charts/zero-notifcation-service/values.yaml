@@ -81,6 +81,9 @@ affinity: {}
 application:
   sendgridApiKey:
   slackApiKey:
+  twilioAccountID:
+  twilioAuthToken:
+  twilioPhoneNumber:
   gracefulShutdownTimeout: 10
   structuredLogging: true
   allowEmailToDomains:
