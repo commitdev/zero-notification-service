@@ -98,7 +98,7 @@ func (s *EmailApiService) SendBulk(ctx context.Context, sendBulkMailRequest serv
 	}
 	responseCode := http.StatusOK
 	if len(successful) == 0 {
-		responseCode = http.StatusInternalServerError
+		responseCode = http.StatusBadRequest
 	}
 	return server.Response(responseCode, server.SendBulkMailResponse{Successful: successful, Failed: failed}), nil
 }

@@ -48,13 +48,16 @@ func main() {
 	EmailApiService := service.NewEmailApiService(config)
 	EmailApiController := server.NewEmailApiController(EmailApiService)
 
+	SmsApiService := service.NewSmsApiService(config)
+	SmsApiController := server.NewSmsApiController(SmsApiService)
+
 	HealthApiService := service.NewHealthApiService(config)
 	HealthApiController := server.NewHealthApiController(HealthApiService)
 
 	NotificationApiService := service.NewNotificationApiService(config)
 	NotificationApiController := server.NewNotificationApiController(NotificationApiService)
 
-	router := server.Logger(server.NewRouter(EmailApiController, HealthApiController, NotificationApiController), "")
+	router := server.NewRouter(EmailApiController, SmsApiController, HealthApiController, NotificationApiController)
 
 	serverAddress := fmt.Sprintf("0.0.0.0:%d", config.Port)
 	server := &http.Server{Addr: serverAddress, Handler: router}

@@ -1,3 +1,4 @@
+.envrc
 zero-notification-service
 .history/
 api/openapi.yaml
