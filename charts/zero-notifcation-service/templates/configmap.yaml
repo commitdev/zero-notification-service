@@ -7,3 +7,4 @@ data:
     GRACEFUL_SHUTDOWN_TIMEOUT_SECONDS: "{{ .Values.application.gracefulShutdownTimeout }}"
     STRUCTURED_LOGGING: "{{ .Values.application.structuredLogging }}"
     ALLOW_EMAIL_TO_DOMAINS: "{{ .Values.application.allowEmailToDomains }}"
+    TWILIO_PHONE_NUMBER: {{ .Values.application.twilioPhoneNumber | quote }}
