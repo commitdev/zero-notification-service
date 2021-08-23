@@ -13,6 +13,7 @@ fullnameOverride: ""
 externalSecret:
   enabled: true
   backendType: secretsManager
+  # This is a list of secret names to fetch from AWS secret manager https://github.com/external-secrets/kubernetes-external-secrets
   dataFrom: []
 
 serviceAccount:
