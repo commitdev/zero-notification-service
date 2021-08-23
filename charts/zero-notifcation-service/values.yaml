@@ -91,4 +91,4 @@ application:
   twilioPhoneNumber: ""
   gracefulShutdownTimeout: 10
   structuredLogging: true
-  allowEmailToDomains:
+  allowEmailToDomains: []
