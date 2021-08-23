@@ -10,6 +10,11 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+externalSecret:
+  enabled: true
+  backendType: secretsManager
+  dataFrom: []
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -79,11 +84,11 @@ affinity: {}
 # See project readme for more information about config options
 
 application:
-  sendgridApiKey:
-  slackApiKey:
-  twilioAccountID:
-  twilioAuthToken:
-  twilioPhoneNumber:
+  sendgridApiKey: ""
+  slackApiKey: ""
+  twilioAccountID: ""
+  twilioAuthToken: ""
+  twilioPhoneNumber: ""
   gracefulShutdownTimeout: 10
   structuredLogging: true
   allowEmailToDomains:
