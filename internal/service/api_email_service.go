@@ -42,7 +42,8 @@ func (s *EmailApiService) SendEmail(ctx context.Context, sendMailRequest server.
 	}
 
 	client := sendgrid.NewSendClient(s.config.SendgridAPIKey)
-	response, err := mail.SendIndividualMail(sendMailRequest.ToAddresses, sendMailRequest.FromAddress, sendMailRequest.CcAddresses, sendMailRequest.BccAddresses, sendMailRequest.Message, client)
+
+	response, err := mail.SendIndividualMail(sendMailRequest.ToAddresses, sendMailRequest.FromAddress, sendMailRequest.CcAddresses, sendMailRequest.BccAddresses, sendMailRequest.Headers, sendMailRequest.Message, client)
 
 	if err != nil {
 		zap.S().Errorf("Error sending mail: %v", response)
@@ -79,7 +80,7 @@ func (s *EmailApiService) SendBulk(ctx context.Context, sendBulkMailRequest serv
 
 	responseChannel := make(chan mail.BulkSendAttempt)
 
-	mail.SendBulkMail(sendBulkMailRequest.ToAddresses, sendBulkMailRequest.FromAddress, sendBulkMailRequest.CcAddresses, sendBulkMailRequest.BccAddresses, sendBulkMailRequest.Message, client, responseChannel)
+	mail.SendBulkMail(sendBulkMailRequest.ToAddresses, sendBulkMailRequest.FromAddress, sendBulkMailRequest.CcAddresses, sendBulkMailRequest.BccAddresses, sendBulkMailRequest.Headers, sendBulkMailRequest.Message, client, responseChannel)
 
 	var successful []server.SendBulkMailResponseSuccessful
 	var failed []server.SendBulkMailResponseFailed
