@@ -22,14 +22,14 @@ type Client interface {
 
 // SendBulkMail sends a batch of email messages to all the specified recipients
 // All the calls to send mail happen in parallel, with their responses returned on the provided channel
-func SendBulkMail(toList []server.EmailRecipient, from server.EmailSender, cc []server.EmailRecipient, bcc []server.EmailRecipient, message server.MailMessage, client Client, responseChannel chan BulkSendAttempt) {
+func SendBulkMail(toList []server.EmailRecipient, from server.EmailSender, cc []server.EmailRecipient, bcc []server.EmailRecipient, headers map[string]string, message server.MailMessage, client Client, responseChannel chan BulkSendAttempt) {
 	wg := sync.WaitGroup{}
 	wg.Add(len(toList))
 
 	// Create goroutines for each send
 	for _, to := range toList {
 		go func(to server.EmailRecipient) {
-			response, err := SendIndividualMail([]server.EmailRecipient{to}, from, cc, bcc, message, client)
+			response, err := SendIndividualMail([]server.EmailRecipient{to}, from, cc, bcc, headers, message, client)
 			responseChannel <- BulkSendAttempt{to.Address, response, err}
 			wg.Done()
 		}(to)
@@ -42,7 +42,7 @@ func SendBulkMail(toList []server.EmailRecipient, from server.EmailSender, cc []
 }
 
 // SendIndividualMail sends an email message
-func SendIndividualMail(to []server.EmailRecipient, from server.EmailSender, cc []server.EmailRecipient, bcc []server.EmailRecipient, message server.MailMessage, client Client) (*rest.Response, error) {
+func SendIndividualMail(to []server.EmailRecipient, from server.EmailSender, cc []server.EmailRecipient, bcc []server.EmailRecipient, headers map[string]string, message server.MailMessage, client Client) (*rest.Response, error) {
 	sendMessage := sendgridMail.NewV3Mail()
 
 	sendMessage.SetFrom(sendgridMail.NewEmail(from.Name, from.Address))
@@ -71,6 +71,12 @@ func SendIndividualMail(to []server.EmailRecipient, from server.EmailSender, cc 
 		personalization.AddBCCs(convertAddresses(bcc)...)
 	}
 	sendMessage.AddPersonalizations(personalization)
+
+	if len(headers) > 0 {
+		for key, value := range headers {
+			sendMessage.SetHeader(key, value)
+		}
+	}
 
 	return client.Send(sendMessage)
 }

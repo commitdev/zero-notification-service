@@ -262,6 +262,8 @@ components:
           $ref: '#/components/schemas/EmailSender'
         message:
           $ref: '#/components/schemas/MailMessage'
+        headers:
+          $ref: '#/components/schemas/MailHeaders'
 
     SendBulkMailRequest:
       type: object
@@ -285,6 +287,8 @@ components:
           $ref: '#/components/schemas/EmailSender'
         message:
           $ref: '#/components/schemas/MailMessage'
+        headers:
+          $ref: '#/components/schemas/MailHeaders'
 
     MailMessage:
       type: object
@@ -304,6 +308,11 @@ components:
           type: integer
           description: Schedule these mesages to go out at the time specified by this UNIX timestamp
           format: int64
+
+    MailHeaders:
+      type: object
+      additionalProperties:
+        type: string
 
     SendSMSRequest:
       type: object

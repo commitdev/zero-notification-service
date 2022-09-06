@@ -20,8 +20,27 @@ type FakeClient struct {
 
 // Mock the Send function
 func (cl *FakeClient) Send(email *sendgridMail.SGMailV3) (*rest.Response, error) {
-	cl.Called()
+	cl.Called(email)
 	return nil, nil
+}
+
+func TestSendMail(t *testing.T) {
+	toList := createRandomRecipients(1, 1)
+	cc := make([]server.EmailRecipient, 0)
+	bcc := make([]server.EmailRecipient, 0)
+	from := server.EmailSender{Name: "Test User", Address: "address@domain.com"}
+	headers := map[string]string{
+		"X-Test-Header": "Test Header Value",
+	}
+	message := server.MailMessage{Subject: "Subject", Body: "Body"}
+	client := FakeClient{}
+
+	headersMatcher := mock.MatchedBy(func(m *sendgridMail.SGMailV3) bool {
+		return m.Headers["X-Test-Header"] == headers["X-Test-Header"]
+	})
+	client.On("Send", headersMatcher).Return(nil, nil)
+	mail.SendIndividualMail(toList, from, cc, bcc, headers, message, &client)
+	client.AssertNumberOfCalls(t, "Send", 1)
 }
 
 func TestSendBulkMail(t *testing.T) {
@@ -29,13 +48,14 @@ func TestSendBulkMail(t *testing.T) {
 	cc := make([]server.EmailRecipient, 0)
 	bcc := make([]server.EmailRecipient, 0)
 	from := server.EmailSender{Name: "Test User", Address: "address@domain.com"}
+	headers := make(map[string]string)
 	message := server.MailMessage{Subject: "Subject", Body: "Body"}
 	client := FakeClient{}
 
-	client.On("Send").Return(nil, nil)
+	client.On("Send", mock.Anything).Return(nil, nil)
 
 	responseChannel := make(chan mail.BulkSendAttempt)
-	mail.SendBulkMail(toList, from, cc, bcc, message, &client, responseChannel)
+	mail.SendBulkMail(toList, from, cc, bcc, headers, message, &client, responseChannel)
 
 	// Range over the channel until empty
 	returnedCount := 0
