@@ -13,14 +13,14 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Generate client
+      # -p properties https://openapi-generator.tech/docs/generators/typescript
       run: |
         docker run --rm -v ${GITHUB_WORKSPACE}:/local openapitools/openapi-generator:cli-5.3.x \
           generate -i /local/api/notification-service.yaml \
           -g typescript \
           -o /local/client \
-          -p projectName="@commitdev/zero-notification-service-client" \
-          -p projectDescription="Generated client for zero-notification-service" \
-          -p projectVersion="${{ github.event.release.tag_name }}" \
+          -p npmName="@commitdev/zero-notification-service-client" \
+          -p npmVersion="${{ github.event.release.tag_name }}" \
           -p moduleName="NotificationService"
         sudo chmod -R a+rw ${GITHUB_WORKSPACE}
 
