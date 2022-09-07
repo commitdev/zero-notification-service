@@ -14,14 +14,22 @@ jobs:
 
     - name: Generate client
       run: |
-        docker run --rm -v ${GITHUB_WORKSPACE}:/local openapitools/openapi-generator-cli generate -i /local/api/notification-service.yaml -g javascript -o /local/client -p projectName="@commitdev/zero-notification-service-client" -p projectDescription="Generated client for zero-notification-service" -p projectVersion="${{ github.event.release.tag_name }}" -p moduleName="NotificationService"
+        docker run --rm -v ${GITHUB_WORKSPACE}:/local openapitools/openapi-generator:cli-5.3.x \
+          generate -i /local/api/notification-service.yaml \
+          -g typescript \
+          -o /local/client \
+          -p projectName="@commitdev/zero-notification-service-client" \
+          -p projectDescription="Generated client for zero-notification-service" \
+          -p projectVersion="${{ github.event.release.tag_name }}" \
+          -p moduleName="NotificationService"
         sudo chmod -R a+rw ${GITHUB_WORKSPACE}
 
     - uses: actions/setup-node@v1
       with:
-        node-version: '12.x'
+        node-version: '14.x'
         registry-url: 'https://registry.npmjs.org'
     - run: cd client; npm install
+    - run: cd client; npm run build
     - run: cd client; npm publish --access public
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
