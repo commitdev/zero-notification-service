@@ -20,7 +20,8 @@ jobs:
           -o /local/client \
           -p projectName="@commitdev/zero-notification-service-client" \
           -p projectDescription="Generated client for zero-notification-service" \
-          -p projectVersion="${{ github.event.release.tag_name }}" -p moduleName="NotificationService"
+          -p projectVersion="${{ github.event.release.tag_name }}" \
+          -p moduleName="NotificationService"
         sudo chmod -R a+rw ${GITHUB_WORKSPACE}
 
     - uses: actions/setup-node@v1
