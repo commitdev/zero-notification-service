@@ -21,6 +21,7 @@ jobs:
           -o /local/client \
           -p npmName="@commitdev/zero-notification-service-client" \
           -p npmVersion="${{ github.event.release.tag_name }}" \
+          -p platform=node \
           -p moduleName="NotificationService"
         sudo chmod -R a+rw ${GITHUB_WORKSPACE}
 
