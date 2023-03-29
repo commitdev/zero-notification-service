@@ -17,6 +17,10 @@ func Init(config *config.Config) {
 		zapConfig := zap.NewProductionConfig()
 		zapConfig.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 		zapConfig.EncoderConfig.MessageKey = "message"
+		zapConfig.EncoderConfig.LevelKey = "log.level"
+		zapConfig.EncoderConfig.CallerKey = "log.origin.file.name"
+		zapConfig.EncoderConfig.TimeKey = "@timestamp"
+		zapConfig.EncoderConfig.FunctionKey = "log.origin.function"
 		rawLogger, err = zapConfig.Build()
 	} else {
 		// Debug level, pretty output
