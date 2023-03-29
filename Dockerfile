@@ -5,7 +5,7 @@ copy . .
 RUN docker-entrypoint.sh generate -i api/notification-service.yaml -g go-server -o ./ -p sourceFolder=internal/server -p packageName=server --git-user-id=commitdev --git-repo-id=zero-notification-service
 
 
-FROM golang:1.14 AS build
+FROM golang:1.18 AS build
 WORKDIR /go/src
 
 COPY go.mod .
@@ -18,7 +18,7 @@ RUN go mod tidy && go mod download
 COPY . .
 COPY --from=generate /go/src/ ./
 
-RUN go get golang.org/x/tools/cmd/goimports && goimports -w internal/server/
+RUN go install golang.org/x/tools/cmd/goimports@latest && goimports -w internal/server/
 
 ENV CGO_ENABLED=0
 
