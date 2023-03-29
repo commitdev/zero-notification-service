@@ -29,7 +29,7 @@ jobs:
       run: |
         docker run --rm -v ${GITHUB_WORKSPACE}:/local openapitools/openapi-generator:cli-5.3.x generate -i /local/api/notification-service.yaml -g go-server -o /local/ -p sourceFolder=internal/server -p packageName=server --git-user-id=commitdev --git-repo-id=zero-notification-service
         sudo chmod -R a+rw ${GITHUB_WORKSPACE}
-        go get golang.org/x/tools/cmd/goimports
+        go install golang.org/x/tools/cmd/goimports@latest
         goimports -w ${GITHUB_WORKSPACE}/internal/server/
 
     - name: Run go vet
