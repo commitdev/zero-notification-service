@@ -11,7 +11,7 @@ run:
 
 generate:
 	openapi-generator generate -i api/notification-service.yaml -g go-server -o ./ -p sourceFolder=internal/server -p packageName=server --git-user-id=commitdev --git-repo-id=zero-notification-service
-	go get golang.org/x/tools/cmd/goimports
+	go install golang.org/x/tools/cmd/goimports@latest
 	goimports -w internal/server/
 
 docker:
