@@ -3,7 +3,6 @@ module github.com/commitdev/zero-notification-service
 go 1.18
 
 require (
-	github.com/gorilla/mux v1.7.3
 	github.com/sendgrid/rest v2.6.2+incompatible
 	github.com/sendgrid/sendgrid-go v3.7.2+incompatible
 	github.com/slack-go/slack v0.8.0
@@ -30,7 +29,7 @@ require (
 	github.com/subosito/gotenv v1.2.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.1.0 // indirect
 	gopkg.in/ini.v1 v1.51.0 // indirect
