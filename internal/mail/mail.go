@@ -29,7 +29,7 @@ func SendBulkMail(toList []server.EmailRecipient, from server.EmailSender, cc []
 	// Create goroutines for each send
 	for _, to := range toList {
 		go func(to server.EmailRecipient) {
-			response, err := SendIndividualMail([]server.EmailRecipient{to}, from, cc, bcc, headers, message, client)
+			response, err := SendIndividualMail([]server.EmailRecipient{to}, from, cc, bcc, headers, message, client, []string{})
 			responseChannel <- BulkSendAttempt{to.Address, response, err}
 			wg.Done()
 		}(to)
@@ -42,7 +42,7 @@ func SendBulkMail(toList []server.EmailRecipient, from server.EmailSender, cc []
 }
 
 // SendIndividualMail sends an email message
-func SendIndividualMail(to []server.EmailRecipient, from server.EmailSender, cc []server.EmailRecipient, bcc []server.EmailRecipient, headers map[string]string, message server.MailMessage, client Client) (*rest.Response, error) {
+func SendIndividualMail(to []server.EmailRecipient, from server.EmailSender, cc []server.EmailRecipient, bcc []server.EmailRecipient, headers map[string]string, message server.MailMessage, client Client, tags []string) (*rest.Response, error) {
 	sendMessage := sendgridMail.NewV3Mail()
 
 	sendMessage.SetFrom(sendgridMail.NewEmail(from.Name, from.Address))
@@ -76,6 +76,10 @@ func SendIndividualMail(to []server.EmailRecipient, from server.EmailSender, cc 
 		for key, value := range headers {
 			sendMessage.SetHeader(key, value)
 		}
+	}
+
+	if len(tags) > 0 {
+		sendMessage.AddCategories(tags...)
 	}
 
 	return client.Send(sendMessage)

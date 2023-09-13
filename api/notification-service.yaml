@@ -264,6 +264,10 @@ components:
           $ref: '#/components/schemas/MailMessage'
         headers:
           $ref: '#/components/schemas/MailHeaders'
+        tags:
+          type: array
+          items:
+            type: string
 
     SendBulkMailRequest:
       type: object
