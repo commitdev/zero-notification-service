@@ -16,7 +16,7 @@ type HealthApiService struct {
 }
 
 // NewHealthApiService creates a default api service
-func NewHealthApiService(c *config.Config) server.HealthApiServicer {
+func NewHealthApiService(c *config.Config) server.HealthAPIServicer {
 	return &HealthApiService{c}
 }
 

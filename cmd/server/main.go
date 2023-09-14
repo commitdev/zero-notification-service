@@ -46,16 +46,16 @@ func main() {
 	go heartbeat()
 
 	EmailApiService := service.NewEmailApiService(config)
-	EmailApiController := server.NewEmailApiController(EmailApiService)
+	EmailApiController := server.NewEmailAPIController(EmailApiService)
 
 	SmsApiService := service.NewSmsApiService(config)
-	SmsApiController := server.NewSmsApiController(SmsApiService)
+	SmsApiController := server.NewSmsAPIController(SmsApiService)
 
 	HealthApiService := service.NewHealthApiService(config)
-	HealthApiController := server.NewHealthApiController(HealthApiService)
+	HealthApiController := server.NewHealthAPIController(HealthApiService)
 
 	NotificationApiService := service.NewNotificationApiService(config)
-	NotificationApiController := server.NewNotificationApiController(NotificationApiService)
+	NotificationApiController := server.NewNotificationAPIController(NotificationApiService)
 
 	router := server.NewRouter(EmailApiController, SmsApiController, HealthApiController, NotificationApiController)
 
