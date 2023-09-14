@@ -43,7 +43,7 @@ func (s *EmailApiService) SendEmail(ctx context.Context, sendMailRequest server.
 
 	client := sendgrid.NewSendClient(s.config.SendgridAPIKey)
 
-	response, err := mail.SendIndividualMail(sendMailRequest.ToAddresses, sendMailRequest.FromAddress, sendMailRequest.CcAddresses, sendMailRequest.BccAddresses, sendMailRequest.Headers, sendMailRequest.Message, client, sendMailRequest.Tags)
+	response, err := mail.SendIndividualMail(sendMailRequest.ToAddresses, sendMailRequest.FromAddress, sendMailRequest.CcAddresses, sendMailRequest.BccAddresses, sendMailRequest.Headers, sendMailRequest.Message, client, sendMailRequest.Tags, sendMailRequest.CustomArgs)
 
 	if err != nil {
 		zap.S().Errorf("Error sending mail: %v", response)

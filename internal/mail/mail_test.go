@@ -39,7 +39,7 @@ func TestSendMail(t *testing.T) {
 		return m.Headers["X-Test-Header"] == headers["X-Test-Header"]
 	})
 	client.On("Send", headersMatcher).Return(nil, nil)
-	mail.SendIndividualMail(toList, from, cc, bcc, headers, message, &client, []string{})
+	mail.SendIndividualMail(toList, from, cc, bcc, headers, message, &client, []string{}, map[string]string{})
 	client.AssertNumberOfCalls(t, "Send", 1)
 }
 
