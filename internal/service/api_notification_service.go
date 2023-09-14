@@ -20,7 +20,7 @@ type NotificationApiService struct {
 }
 
 // NewNotificationApiService creates a default api service
-func NewNotificationApiService(c *config.Config) server.NotificationApiServicer {
+func NewNotificationApiService(c *config.Config) server.NotificationAPIServicer {
 	return &NotificationApiService{c}
 }
 

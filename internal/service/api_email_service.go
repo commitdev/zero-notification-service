@@ -20,7 +20,7 @@ type EmailApiService struct {
 }
 
 // NewEmailApiService creates a default api service
-func NewEmailApiService(c *config.Config) server.EmailApiServicer {
+func NewEmailApiService(c *config.Config) server.EmailAPIServicer {
 	return &EmailApiService{c}
 }
 
@@ -82,19 +82,19 @@ func (s *EmailApiService) SendBulk(ctx context.Context, sendBulkMailRequest serv
 
 	mail.SendBulkMail(sendBulkMailRequest.ToAddresses, sendBulkMailRequest.FromAddress, sendBulkMailRequest.CcAddresses, sendBulkMailRequest.BccAddresses, sendBulkMailRequest.Headers, sendBulkMailRequest.Message, client, responseChannel)
 
-	var successful []server.SendBulkMailResponseSuccessful
-	var failed []server.SendBulkMailResponseFailed
+	var successful []server.SendBulkMailResponseSuccessfulInner
+	var failed []server.SendBulkMailResponseFailedInner
 
 	// Read all the responses from the channel. This will block if responses aren't ready and the channel is not yet closed
 	for r := range responseChannel {
 		if r.Error != nil {
 			zap.S().Errorf("Error sending bulk mail: %v", r.Error)
-			failed = append(failed, server.SendBulkMailResponseFailed{EmailAddress: r.EmailAddress, Error: fmt.Sprintf("Unable to send email: %v\n", r.Error)})
+			failed = append(failed, server.SendBulkMailResponseFailedInner{EmailAddress: r.EmailAddress, Error: fmt.Sprintf("Unable to send email: %v\n", r.Error)})
 		} else if !(r.Response.StatusCode >= 200 && r.Response.StatusCode <= 299) {
 			zap.S().Errorf("Failure from Sendgrid when sending bulk mail: %v", r.Response)
-			failed = append(failed, server.SendBulkMailResponseFailed{EmailAddress: r.EmailAddress, Error: fmt.Sprintf("Unable to send email: %v from mail provider: %v\n", r.Response.StatusCode, r.Response.Body)})
+			failed = append(failed, server.SendBulkMailResponseFailedInner{EmailAddress: r.EmailAddress, Error: fmt.Sprintf("Unable to send email: %v from mail provider: %v\n", r.Response.StatusCode, r.Response.Body)})
 		} else {
-			successful = append(successful, server.SendBulkMailResponseSuccessful{EmailAddress: r.EmailAddress, TrackingId: r.Response.Headers["X-Message-Id"][0]})
+			successful = append(successful, server.SendBulkMailResponseSuccessfulInner{EmailAddress: r.EmailAddress, TrackingId: r.Response.Headers["X-Message-Id"][0]})
 		}
 	}
 	responseCode := http.StatusOK

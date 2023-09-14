@@ -21,7 +21,7 @@ type SmsApiService struct {
 }
 
 // NewSmsApiService creates a default api service
-func NewSmsApiService(c *config.Config) server.SmsApiServicer {
+func NewSmsApiService(c *config.Config) server.SmsAPIServicer {
 	return &SmsApiService{c}
 }
 
