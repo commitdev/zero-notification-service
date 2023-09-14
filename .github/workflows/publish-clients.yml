@@ -15,7 +15,7 @@ jobs:
     - name: Generate client
       # -p properties https://openapi-generator.tech/docs/generators/typescript
       run: |
-        docker run --rm -v ${GITHUB_WORKSPACE}:/local openapitools/openapi-generator:cli-5.3.x \
+        docker run --rm -v ${GITHUB_WORKSPACE}:/local openapitools/openapi-generator-cli:v7.0.0 \
           generate -i /local/api/notification-service.yaml \
           -g typescript \
           -o /local/client \
